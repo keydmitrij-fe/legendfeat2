@@ -1,0 +1,74 @@
+ul {
+    padding: 0;
+    margin: 0;
+}
+
+.task-container {
+    margin-top: 1rem ;
+    padding: 0 1rem;
+    display: flex;
+    background-color: white;
+    height: 4rem;
+    align-items: center;
+    border-radius: 6px;
+    box-shadow: 1px 1px 2px rgb(104, 104, 104);
+
+}
+
+.form {
+display: flex;
+width: 100%;
+justify-content: space-between;
+align-items: center;
+}
+
+.label-container {
+    display: flex;
+    gap: 1rem;
+}
+
+#checkbox {
+    border: 3px solid black;
+    border-radius: 10px;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.label {
+    font-size: 1.5rem;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.edit {
+    background-color: rgb(108, 108, 230);
+    border-radius: 6px;
+    border: 1px solid rgb(108, 108, 230);
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.edit:hover {
+    background-color: rgb(146, 146, 243);
+}
+
+.delete {
+    background-color: rgb(241, 74, 74);
+    border-radius: 6px;
+    border: 1px solid rgb(241, 74, 74);
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.delete:hover {
+    background-color: rgb(255, 135, 135);
+}
