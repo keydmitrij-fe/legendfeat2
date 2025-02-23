@@ -1,9 +1,7 @@
 import { useState } from "react";
 import "./TaskAdding.css";
 
-
-let inputElementValue = document.getElementsByClassName("input").value;
-export default function TaskAdding() {
+export default function TaskAdding({onUpdate}) {
   const [inputValue, setInputValue] = useState("");
 
   function handleChange(value) {
@@ -18,15 +16,22 @@ export default function TaskAdding() {
         isDone: false,
       }),
     });
+    onUpdate();
   }
+  console.log(inputValue);
   return (
     <div>
       <form className="form">
-        <input type="text" className="input" placeholder="Task To Be Done..." onChange={(event) => handleChange(event.target.value)} />
+        <input
+          type="text"
+          className="input"
+          placeholder="Task To Be Done..."
+          onChange={(event) => handleChange(event.target.value)}
+        />
         <button
-          type="submit"
+          type="button"
           className="button"
-          onClick={() => addTask(inputElementValue)}
+          onClick={() => addTask()}
         >
           Add
         </button>

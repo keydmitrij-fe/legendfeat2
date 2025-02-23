@@ -1,31 +1,31 @@
 import { useEffect, useState } from "react";
 import "./Tasks.css";
 
-export default function Task(props) {
+export default function Task({isDelete, onUpdate, isAdd, ...props}) {
   const [tasks, setTasks] = useState([]);
   const tabId = props.tabId;
 
   useEffect(() => {
     async function fetchTasks(tabId) {
       const response = await fetch(
-        "https://easydev.club/api/v2//todos?filter="+`${tabId}`
+        "https://easydev.club/api/v2//todos?filter=" + `${tabId}`
       );
       const resData = await response.json();
       setTasks(resData.data);
     }
-    
-    fetchTasks(props.tabId);
-  }, [tabId]);
 
+    fetchTasks(tabId);
+  }, [tabId, isAdd, isDelete]);
 
-  function checkTasks(){
+  function checkTasks() {
     console.log(tasks);
   }
 
   async function deleteTask(id) {
-    await fetch("https://easydev.club/api/v2/todos/"+`${id}`, {
+    await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
       method: "DELETE",
     });
+    onUpdate();
   }
 
   return (
@@ -34,13 +34,17 @@ export default function Task(props) {
         <li key={task.id} className="task-container">
           <form className="form">
             <div className="label-container">
-              <input type="checkbox" id="checkbox" className="check" />
-              <label htmlFor="checkbox" className="label" id="task-title">
+              <input type="checkbox" defaultChecked={task.isDone === true} id={task.id} className="checkbox" />
+              <label htmlFor={task.id} className={task.isDone === true ? "label done" : "label"} id="task-title">
                 {task.title}
               </label>
             </div>
             <div className="buttons">
-              <button type="button" className="edit" onClick={()=> checkTasks()}>
+              <button
+                type="button"
+                className="edit"
+                onClick={() => checkTasks()}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   x="0px"
@@ -53,7 +57,11 @@ export default function Task(props) {
                   <path d="M 39.822266 6.0019531 C 39.265016 6.0019531 38.707703 6.2127188 38.283203 6.6367188 L 21.730469 23.191406 L 20.998047 27.001953 L 24.808594 26.269531 L 41.361328 9.7167969 C 41.772328 9.3057969 42 8.7587344 42 8.1777344 C 42 7.5967344 41.772328 7.0487188 41.361328 6.6367188 C 40.936828 6.2127188 40.379516 6.0019531 39.822266 6.0019531 z M 12.5 7 C 9.486124 7 7 9.486124 7 12.5 L 7 35.5 C 7 38.513876 9.486124 41 12.5 41 L 35.5 41 C 38.513876 41 41 38.513876 41 35.5 L 41 19 A 2.0002 2.0002 0 1 0 37 19 L 37 35.5 C 37 36.352124 36.352124 37 35.5 37 L 12.5 37 C 11.647876 37 11 36.352124 11 35.5 L 11 12.5 C 11 11.647876 11.647876 11 12.5 11 L 29 11 A 2.0002 2.0002 0 1 0 29 7 L 12.5 7 z"></path>
                 </svg>
               </button>
-              <button type="button" className="delete" onClick={() => deleteTask(task.id)}>
+              <button
+                type="button"
+                className="delete"
+                onClick={() => deleteTask(task.id)}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   x="0px"
