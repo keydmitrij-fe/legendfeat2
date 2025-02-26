@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./TaskAdding.css";
 
-export default function TaskAdding({onUpdate}) {
+export default function TaskAdding({ onUpdate, mainInput }) {
   const [inputValue, setInputValue] = useState("");
 
   function handleChange(value) {
@@ -16,14 +16,19 @@ export default function TaskAdding({onUpdate}) {
         isDone: false,
       }),
     });
+    mainInput.value = "";
+    setInputValue("");
     onUpdate();
   }
-  console.log(inputValue);
   return (
     <div>
-      <form className="form">
+      <form className="main-form">
         <input
+          id="main-input"
           type="text"
+          minLength="2"
+          maxLength="64"
+          required
           className="input"
           placeholder="Task To Be Done..."
           onChange={(event) => handleChange(event.target.value)}
@@ -31,7 +36,13 @@ export default function TaskAdding({onUpdate}) {
         <button
           type="button"
           className="button"
-          onClick={() => addTask()}
+          onClick={() => {
+            inputValue.length <= 0
+              ? alert("Введите название задачи!")
+              : inputValue.length >= 2 && inputValue.length <= 64
+              ? addTask()
+              : alert("Длина введенных символов должна быть от 2 до 64");
+          }}
         >
           Add
         </button>
