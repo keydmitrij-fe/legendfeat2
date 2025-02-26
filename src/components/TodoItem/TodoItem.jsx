@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./TodoItem.css";
-import saveIcon from "/frontend/todo-list-new/todo-list/src/assets/icons/save-icon.png";
-import cancelIcon from "/frontend/todo-list-new/todo-list/src/assets/icons/cancel-icon.png";
+import saveIcon from "../../assets/icons/save-icon.png";
+import cancelIcon from "../../assets/icons/cancel-icon.png";
 
 export default function TodoItem(props) {
   const [isEdit, setIsEdit] = useState(false);
