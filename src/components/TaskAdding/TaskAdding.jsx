@@ -1,25 +1,16 @@
 import { useState } from "react";
+import { addTask } from "../../api/api.js";
 import "./TaskAdding.css";
 
-export default function TaskAdding({ onUpdate, mainInput }) {
+export default function TaskAdding({ onUpdate }) {
   const [inputValue, setInputValue] = useState("");
+
+  let input = document.getElementById("main-input");
 
   function handleChange(value) {
     setInputValue(() => value);
   }
-  async function addTask() {
-    await fetch("https://easydev.club/api/v2/todos", {
-      method: "POST",
-      "Content-type": "application/json",
-      body: JSON.stringify({
-        title: inputValue,
-        isDone: false,
-      }),
-    });
-    mainInput.value = "";
-    setInputValue("");
-    onUpdate();
-  }
+
   return (
     <div>
       <form className="main-form">
@@ -40,7 +31,7 @@ export default function TaskAdding({ onUpdate, mainInput }) {
             inputValue.length <= 0
               ? alert("Введите название задачи!")
               : inputValue.length >= 2 && inputValue.length <= 64
-              ? addTask()
+              ? addTask(inputValue, input, setInputValue, onUpdate)
               : alert("Длина введенных символов должна быть от 2 до 64");
           }}
         >

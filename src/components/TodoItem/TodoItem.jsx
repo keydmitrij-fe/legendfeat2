@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { fetchEditTasksToDone, deleteTask, fetchEditTasksName } from "../../api/api.js";
 import "./TodoItem.css";
 import saveIcon from "../../assets/icons/save-icon.png";
 import cancelIcon from "../../assets/icons/cancel-icon.png";
@@ -7,22 +8,10 @@ export default function TodoItem(props) {
   const [isEdit, setIsEdit] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
 
-  async function fetchEditTasksName() {
-    await fetch("https://easydev.club/api/v2/todos/" + `${props.taskId}`, {
-      method: "PUT",
-      "Content-type": "application/json",
-      body: JSON.stringify({
-        title: newTaskName,
-      }),
-    });
-    setIsEdit(false);
-    props.onUpdate(props.tabId);
-  }
-
   function handleEditClick() {
     setNewTaskName(props.taskTitle);
     setIsEdit(true);
-    props.onUpdate(props.tabId);
+    props.onUpdate();
   }
 
   function handleCancelClick() {
@@ -31,7 +20,7 @@ export default function TodoItem(props) {
   }
 
   function saveNewTaskName() {
-    fetchEditTasksName(props.taskId);
+    fetchEditTasksName(props.taskId, newTaskName, setIsEdit, props.onUpdate, props.tabId);
   }
 
   return (
@@ -42,7 +31,7 @@ export default function TodoItem(props) {
             type="checkbox"
             checked={props.taskIsDone}
             onClick={() =>
-              props.onEditTaskToDone(props.taskId, props.taskIsDone)
+              fetchEditTasksToDone(props.taskId, props.taskIsDone, props.onUpdateStatus)
             }
             readOnly
             id={props.taskId}
@@ -94,7 +83,7 @@ export default function TodoItem(props) {
             <button
               type="button"
               className="delete"
-              onClick={() => props.onDelete(props.taskId)}
+              onClick={() => deleteTask(props.taskId, props.onDelete)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +121,7 @@ export default function TodoItem(props) {
             <button
               type="button"
               className="delete"
-              onClick={() => props.onDelete(props.taskId)}
+              onClick={() => deleteTask(props.taskId, props.onDelete)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
