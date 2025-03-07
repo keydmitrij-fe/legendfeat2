@@ -1,17 +1,16 @@
-export async function fetchTasks(tab, setTasks, setQuant) {
+export async function fetchTasks(tab) {
   try {
     const response = await fetch(
-      "https://easydev.club/api/v2//todos?filter=" + `${tab}`
+      "https://easydev.club/api/v2/todos?filter=" + `${tab}`
     );
     const resData = await response.json();
-    setTasks(resData.data);
-    setQuant(resData.info);
+    return resData;
   } catch (error) {
     alert("Ошибка: " + error);
   }
 }
 
-export async function addTask(inputValue, mainInput, setInputValue, onUpdate) {
+export async function addTask(inputValue) {
   try {
     await fetch("https://easydev.club/api/v2/todos", {
       method: "POST",
@@ -21,15 +20,13 @@ export async function addTask(inputValue, mainInput, setInputValue, onUpdate) {
         isDone: false,
       }),
     });
-    mainInput.value = "";
-    setInputValue("");
-    onUpdate();
-  } catch (error) {
+  } 
+  catch (error) {
     alert("Ошибка: " + error);
   }
 }
 
-export async function fetchEditTasksToDone(id, taskIsDone, onUpdateStatus) {
+export async function fetchEditTasksToDone(id, taskIsDone) {
   try {
     await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
       method: "PUT",
@@ -38,31 +35,22 @@ export async function fetchEditTasksToDone(id, taskIsDone, onUpdateStatus) {
         isDone: !taskIsDone,
       }),
     });
-    onUpdateStatus();
   } catch (error) {
     alert("Ошибка: " + error);
   }
 }
 
-export async function deleteTask(id, onDelete) {
+export async function deleteTask(id) {
   try {
     await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
       method: "DELETE",
     });
-
-    onDelete();
   } catch (error) {
     alert("Ошибка: " + error);
   }
 }
 
-export async function fetchEditTasksName(
-  id,
-  newTaskName,
-  setIsEdit,
-  onUpdate,
-  tabId
-) {
+export async function fetchEditTasksName(id, newTaskName) {
   try {
     await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
       method: "PUT",
@@ -71,8 +59,6 @@ export async function fetchEditTasksName(
         title: newTaskName,
       }),
     });
-    setIsEdit(false);
-    onUpdate(tabId);
   } catch (error) {
     alert("Ошибка: " + error);
   }

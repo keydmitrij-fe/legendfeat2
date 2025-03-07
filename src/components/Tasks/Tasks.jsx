@@ -1,7 +1,7 @@
 import "./Tasks.css";
 import TodoItem from "../TodoItem/TodoItem.jsx";
 
-export default function Task({
+export default function Tasks({
   tasks,
   onUpdateStatus,
   onDelete,

@@ -5,15 +5,23 @@ import "./TaskAdding.css";
 export default function TaskAdding({ onUpdate }) {
   const [inputValue, setInputValue] = useState("");
 
-  let input = document.getElementById("main-input");
+  async function handleSubmit() {
+    {
+      inputValue.length <= 0
+        ? alert("Введите название задачи!")
+        : inputValue.length >= 2 && inputValue.length <= 64
+        ? (await addTask(inputValue), onUpdate(), setInputValue(""))
+        : alert("Длина введенных символов должна быть от 2 до 64");
+    }
+  }
 
-  function handleChange(value) {
-    setInputValue(() => value);
+  function handleChange(e) {
+    setInputValue(e.target.value);
   }
 
   return (
     <div>
-      <form className="main-form">
+      <form className="main-form" onSubmit={(event) => {handleSubmit(); event.preventDefault()}}>
         <input
           id="main-input"
           type="text"
@@ -22,19 +30,10 @@ export default function TaskAdding({ onUpdate }) {
           required
           className="input"
           placeholder="Task To Be Done..."
-          onChange={(event) => handleChange(event.target.value)}
+          onChange={handleChange}
+          value={inputValue}
         />
-        <button
-          type="button"
-          className="button"
-          onClick={() => {
-            inputValue.length <= 0
-              ? alert("Введите название задачи!")
-              : inputValue.length >= 2 && inputValue.length <= 64
-              ? addTask(inputValue, input, setInputValue, onUpdate)
-              : alert("Длина введенных символов должна быть от 2 до 64");
-          }}
-        >
+        <button type="submit" className="button">
           Add
         </button>
       </form>
