@@ -1,13 +1,7 @@
 import "./Tasks.css";
 import TodoItem from "../TodoItem/TodoItem.jsx";
 
-export default function Tasks({
-  tasks,
-  onUpdateStatus,
-  onDelete,
-  onUpdate,
-  ...props
-}) {
+export default function Tasks({ tasks, onUpdate, ...props }) {
   const tabId = props.tabId;
 
   return (
@@ -19,9 +13,9 @@ export default function Tasks({
           taskId={task.id}
           taskIsDone={task.isDone}
           taskTitle={task.title}
-          onDelete={onDelete}
           onUpdate={onUpdate}
-          onUpdateStatus={onUpdateStatus}
+          minimalLength={props.minimalLength}
+          maximalLength={props.maximalLength}
         />
       ))}
     </ul>
