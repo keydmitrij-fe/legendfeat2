@@ -1,19 +1,30 @@
 import { useState } from "react";
 import { addTask } from "../../api/api.js";
 import "./TaskAdding.css";
+import {
+  MAXIMAL_TASK_LENGTH,
+  MINIMAL_TASK_LENGTH,
+} from "../../constants/constants.js";
 
-export default function TaskAdding({ onUpdate, minimalLength, maximalLength }) {
+export default function TaskAdding({ onUpdate }) {
   const [inputValue, setInputValue] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (inputValue.length <= 0) {
-      alert("Введите название задачи!");
-    } else if (inputValue.length >= 2 && inputValue.length <= 64) {
-      await addTask(inputValue), onUpdate(), setInputValue("");
-    } else {
-      alert("Длина введенных символов должна быть от 2 до 64");
+    if (!inputValue.length) {
+      return alert("Введите название задачи!");
     }
+
+    if (
+      inputValue.length < MINIMAL_TASK_LENGTH ||
+      inputValue.length > MAXIMAL_TASK_LENGTH
+    ) {
+      return alert(
+        `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
+      );
+    }
+
+    await addTask(inputValue), onUpdate(), setInputValue("");
   }
 
   function handleChange(e) {
@@ -26,9 +37,6 @@ export default function TaskAdding({ onUpdate, minimalLength, maximalLength }) {
         <input
           id="main-input"
           type="text"
-          minLength={minimalLength}
-          maxLength={maximalLength}
-          required
           className="input"
           placeholder="Task To Be Done..."
           onChange={handleChange}

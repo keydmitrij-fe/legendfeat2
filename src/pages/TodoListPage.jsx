@@ -6,9 +6,6 @@ import Tabs from "../components/Tabs/Tabs.jsx";
 import TaskAdding from "../components/TaskAdding/TaskAdding.jsx";
 import Tasks from "../components/Tasks/Tasks.jsx";
 
-const MINIMAL_TASK_LENGTH = 2;
-const MAXIMAL_TASK_LENGTH = 64;
-
 export default function TodoListPage() {
   const [tab, setTab] = useState("all");
   const [quantityTasks, setQuantityTasks] = useState({});
@@ -34,11 +31,7 @@ export default function TodoListPage() {
 
   return (
     <>
-      <TaskAdding
-        minimalLength={MINIMAL_TASK_LENGTH}
-        maximalLength={MAXIMAL_TASK_LENGTH}
-        onUpdate={updateTaskList}
-      />
+      <TaskAdding onUpdate={updateTaskList} />
       <div className="tabs-container">
         <Tabs
           tabId={tab}
@@ -47,13 +40,7 @@ export default function TodoListPage() {
         />
       </div>
       <div>
-        <Tasks
-          minimalLength={MINIMAL_TASK_LENGTH}
-          maximalLength={MAXIMAL_TASK_LENGTH}
-          tasks={tasks}
-          onUpdate={updateTaskList}
-          tabId={tab}
-        />
+        <Tasks tasks={tasks} onUpdate={updateTaskList} tabId={tab} />
       </div>
     </>
   );

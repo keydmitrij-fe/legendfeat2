@@ -1,7 +1,7 @@
 export async function fetchTasks(tab) {
   try {
     const response = await fetch(
-      "https://easydev.club/api/v2/todos?filter=" + `${tab}`
+      `https://easydev.club/api/v2/todos?filter=${tab}`
     );
     const resData = await response.json();
     return resData;
@@ -20,15 +20,14 @@ export async function addTask(inputValue) {
         isDone: false,
       }),
     });
-  } 
-  catch (error) {
+  } catch (error) {
     alert("Ошибка: " + error);
   }
 }
 
 export async function fetchEditTasksToDone(id, taskIsDone) {
   try {
-    await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
+    await fetch(`https://easydev.club/api/v2/todos/${id}`, {
       method: "PUT",
       "Content-type": "application/json",
       body: JSON.stringify({
@@ -42,7 +41,7 @@ export async function fetchEditTasksToDone(id, taskIsDone) {
 
 export async function deleteTask(id) {
   try {
-    await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
+    await fetch(`https://easydev.club/api/v2/todos/${id}`, {
       method: "DELETE",
     });
   } catch (error) {
@@ -52,7 +51,7 @@ export async function deleteTask(id) {
 
 export async function fetchEditTasksName(id, newTaskName) {
   try {
-    await fetch("https://easydev.club/api/v2/todos/" + `${id}`, {
+    await fetch(`https://easydev.club/api/v2/todos/${id}`, {
       method: "PUT",
       "Content-type": "application/json",
       body: JSON.stringify({
