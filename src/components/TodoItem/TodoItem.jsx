@@ -39,12 +39,6 @@ export default function TodoItem(props) {
     setIsEdit(false);
   }
 
-  async function handleSaveNewTaskName() {
-    await fetchEditTasksName(props.taskId, newTaskName);
-    setIsEdit(false);
-    props.onUpdate();
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
     if (!newTaskName.length) {
@@ -59,7 +53,9 @@ export default function TodoItem(props) {
         `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
       );
     }
-    await handleSaveNewTaskName();
+    await fetchEditTasksName(props.taskId, newTaskName);
+    setIsEdit(false);
+    props.onUpdate();
   }
 
   return (

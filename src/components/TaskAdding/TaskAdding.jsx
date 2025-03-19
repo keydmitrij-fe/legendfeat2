@@ -24,7 +24,9 @@ export default function TaskAdding({ onUpdate }) {
       );
     }
 
-    await addTask(inputValue), onUpdate(), setInputValue("");
+    await addTask(inputValue);
+    onUpdate();
+    setInputValue("");
   }
 
   function handleChange(e) {
