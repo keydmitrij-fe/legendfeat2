@@ -1,6 +1,10 @@
 import "./Tabs.css";
 
-export default function Tabs(props) {
+const Tabs: React.FC<{
+  onSelect: (tab: string) => void;
+  tabId: string;
+  quantityTasks: { all: number; completed: number; inWork: number };
+}> = (props) => {
   return (
     <>
       <button
@@ -23,4 +27,6 @@ export default function Tabs(props) {
       </button>
     </>
   );
-}
+};
+
+export default Tabs;
