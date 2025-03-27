@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-// import {Todo} from "./api/interface.ts"
+
 import { fetchTasks } from "../api/api.js";
 import "./TodoListPage.css";
 import Tabs from "../components/Tabs/Tabs.jsx";
