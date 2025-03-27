@@ -23,6 +23,7 @@ const TodoListPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line
   }, [tab]);
 
   const handleClick = (tab: string) => {
