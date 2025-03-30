@@ -1,5 +1,6 @@
+import { MetaResponse, Todo, TodoInfo } from "./interface";
 
-export async function fetchTasks(status?: string) {
+export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | any> {
     try {
         const response = await fetch(
             `https://easydev.club/api/v1/todos?filter=${status}`
@@ -34,7 +35,7 @@ export async function fetchEditTasksToDone(id: number, isDone: boolean) {
                 "Content-type": "application/json",
             },
             body: JSON.stringify({
-                isDone: !isDone,
+                isDone: isDone,
             }),
         });
     } catch (error) {

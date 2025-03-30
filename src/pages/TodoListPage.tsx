@@ -7,7 +7,7 @@ import TaskAdding from "../components/TaskAdding/TaskAdding.tsx";
 import Tasks from "../components/Tasks/Tasks.tsx";
 
 const TodoListPage: React.FC = () => {
-  const [tab, setTab] = useState<string>("all");
+  const [tab, setTab] = useState<"all" | "completed" | "inWork">("all");
   const [quantityTasks, setQuantityTasks] = useState<TodoInfo>({
     all: 0,
     completed: 0,
@@ -26,7 +26,7 @@ const TodoListPage: React.FC = () => {
     // eslint-disable-next-line
   }, [tab]);
 
-  const handleClick = (tab: string) => {
+  const handleClick = (tab: "all" | "completed" | "inWork") => {
     setTab(tab);
   };
 

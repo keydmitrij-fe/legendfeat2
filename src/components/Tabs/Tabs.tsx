@@ -1,9 +1,10 @@
+import { TodoInfo } from "../../api/interface";
 import "./Tabs.css";
 
 const Tabs: React.FC<{
-  onSelect: (tab: string) => void;
+  onSelect: (tab: "all" | "completed" | "inWork") => void;
   tabId: string;
-  quantityTasks: { all: number; completed: number; inWork: number };
+  quantityTasks: TodoInfo;
 }> = (props) => {
   return (
     <>

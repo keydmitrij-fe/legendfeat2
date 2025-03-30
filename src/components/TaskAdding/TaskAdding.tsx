@@ -12,7 +12,7 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!inputValue?.length) {
+    if (!inputValue.length) {
       return alert("Введите название задачи!");
     }
 

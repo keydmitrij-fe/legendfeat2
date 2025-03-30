@@ -29,7 +29,7 @@ const TodoItem: React.FC<{
 
   async function handleEditClickToDone() {
     setUpdateTaskStatus(!props.taskIsDone);
-    const request: TodoRequest = { isDone: updateTaskStatus };
+    const request: TodoRequest = { isDone: !updateTaskStatus };
     await fetchEditTasksToDone(props.taskId, request.isDone!);
     props.onUpdate();
   }
