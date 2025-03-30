@@ -1,16 +1,16 @@
-export interface TodoRequest { 
+export interface TodoRequest {
 	title?: string;
- 	isDone?: boolean;  // изменение статуса задачи происходит через этот флаг
- } 
+	isDone?: boolean;  // изменение статуса задачи происходит через этот флаг
+}
 
- export interface Todo {
-    id: number;
-    title: string;
-    created: string; // ISO date string
-    isDone: boolean;
-  }
+export interface Todo {
+	id: number;
+	title: string;
+	created: string; // ISO date string
+	isDone: boolean;
+}
 
-export interface TodoInfo { 
+export interface TodoInfo {
 	all: number
 	completed: number
 	inWork: number

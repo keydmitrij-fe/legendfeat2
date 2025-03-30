@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import {
   fetchEditTasksToDone,
   deleteTask,
   fetchEditTasksName,
-} from "../../api/api.js";
+} from "../../api/api.ts";
 import "./TodoItem.css";
 import saveIcon from "../../assets/icons/save-icon.png";
 import cancelIcon from "../../assets/icons/cancel-icon.png";
@@ -12,14 +12,25 @@ import editIcon from "../../assets/icons/edit-icon.svg";
 import {
   MINIMAL_TASK_LENGTH,
   MAXIMAL_TASK_LENGTH,
-} from "../../constants/constants.js";
+} from "../../constants/constants.ts";
+import { TodoRequest } from "../../api/interface.ts";
 
-export default function TodoItem(props) {
-  const [isEdit, setIsEdit] = useState(false);
-  const [newTaskName, setNewTaskName] = useState("");
+const TodoItem: React.FC<{
+  taskId: number;
+  taskIsDone: boolean;
+  taskTitle: string;
+  onUpdate: () => void;
+}> = (props) => {
+  const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
+    props.taskIsDone
+  );
+  const [updateTaskName, setUpdateTaskName] = useState<string>();
 
   async function handleEditClickToDone() {
-    await fetchEditTasksToDone(props.taskId, props.taskIsDone);
+    setUpdateTaskStatus(!props.taskIsDone);
+    const request: TodoRequest = { isDone: !updateTaskStatus };
+    await fetchEditTasksToDone(props.taskId, request.isDone!);
     props.onUpdate();
   }
 
@@ -29,31 +40,34 @@ export default function TodoItem(props) {
   }
 
   function handleEditClick() {
-    setNewTaskName(props.taskTitle);
+    setUpdateTaskName(props.taskTitle);
     setIsEdit(true);
     props.onUpdate();
   }
 
   function handleCancelClick() {
-    setNewTaskName("");
+    setUpdateTaskName("");
     setIsEdit(false);
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!newTaskName.length) {
+    if (!updateTaskName?.length) {
       return alert("Введите название задачи!");
     }
 
     if (
-      newTaskName.length < MINIMAL_TASK_LENGTH ||
-      newTaskName.length > MAXIMAL_TASK_LENGTH
+      updateTaskName.length < MINIMAL_TASK_LENGTH ||
+      updateTaskName.length > MAXIMAL_TASK_LENGTH
     ) {
       return alert(
         `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
       );
     }
-    await fetchEditTasksName(props.taskId, newTaskName);
+    const request: TodoRequest = {
+      title: updateTaskName,
+    };
+    await fetchEditTasksName(props.taskId, request.title!);
     setIsEdit(false);
     props.onUpdate();
   }
@@ -63,10 +77,9 @@ export default function TodoItem(props) {
       <div className="checkbox-container">
         <input
           type="checkbox"
-          checked={props.taskIsDone}
+          checked={updateTaskStatus}
           onClick={handleEditClickToDone}
           readOnly
-          id={props.taskId}
           className="checkbox"
         />
       </div>
@@ -75,7 +88,7 @@ export default function TodoItem(props) {
           <div className="label-container">
             <p
               className={
-                props.taskIsDone === true ? "paragraph done" : "paragraph"
+                updateTaskStatus === true ? "paragraph done" : "paragraph"
               }
               id="task-title"
             >
@@ -83,12 +96,7 @@ export default function TodoItem(props) {
             </p>
           </div>
 
-          <button
-            type="button"
-            id={props.taskId}
-            className="edit"
-            onClick={handleEditClick}
-          >
+          <button type="button" className="edit" onClick={handleEditClick}>
             <img src={editIcon} alt="icon edit" />
           </button>
         </>
@@ -98,13 +106,14 @@ export default function TodoItem(props) {
           <div className="label-container">
             <input
               className="edit-input"
-              id={props.taskId}
-              value={newTaskName}
-              onChange={(e) => setNewTaskName(e.target.value)}
+              value={updateTaskName}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setUpdateTaskName(e.target.value)
+              }
             />
           </div>
           <div className="edit-buttons">
-            <button type="submit" id={props.taskId} className="save-button">
+            <button type="submit" className="save-button">
               <img src={saveIcon} alt="save icon" className="image" />
             </button>
             <button
@@ -122,4 +131,6 @@ export default function TodoItem(props) {
       </button>
     </li>
   );
-}
+};
+
+export default TodoItem;

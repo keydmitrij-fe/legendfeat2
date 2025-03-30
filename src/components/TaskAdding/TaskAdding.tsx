@@ -1,15 +1,16 @@
-import { useState } from "react";
-import { addTask } from "../../api/api.js";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { addTask } from "../../api/api.ts";
 import "./TaskAdding.css";
 import {
   MAXIMAL_TASK_LENGTH,
   MINIMAL_TASK_LENGTH,
-} from "../../constants/constants.js";
+} from "../../constants/constants.ts";
+import { TodoRequest } from "../../api/interface.ts";
 
-export default function TaskAdding({ onUpdate }) {
-  const [inputValue, setInputValue] = useState("");
+const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
+  const [inputValue, setInputValue] = useState<string>("");
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!inputValue.length) {
       return alert("Введите название задачи!");
@@ -23,14 +24,16 @@ export default function TaskAdding({ onUpdate }) {
         `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
       );
     }
-
-    await addTask(inputValue);
-    onUpdate();
+    const request: TodoRequest = {
+      title: inputValue,
+    };
+    await addTask(request.title!);
+    props.onUpdate();
     setInputValue("");
   }
 
-  function handleChange(e) {
-    setInputValue(e.target.value);
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+    setInputValue(event.target.value);
   }
 
   return (
@@ -50,4 +53,6 @@ export default function TaskAdding({ onUpdate }) {
       </form>
     </div>
   );
-}
+};
+
+export default TaskAdding;
