@@ -1,6 +1,11 @@
+import { TodoInfo } from "../../api/interface";
 import "./Tabs.css";
 
-export default function Tabs(props) {
+const Tabs: React.FC<{
+  onSelect: (tab: "all" | "completed" | "inWork") => void;
+  tabId: string;
+  quantityTasks: TodoInfo;
+}> = (props) => {
   return (
     <>
       <button
@@ -23,4 +28,6 @@ export default function Tabs(props) {
       </button>
     </>
   );
-}
+};
+
+export default Tabs;
