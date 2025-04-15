@@ -1,10 +1,11 @@
+import { List } from "antd";
 import "./Tasks.css";
 import TodoItem from "../TodoItem/TodoItem.tsx";
 import { Todo } from "../../api/interface";
 
 const Tasks: React.FC<{ tasks: Todo[]; onUpdate: () => void }> = (props) => {
   return (
-    <ul>
+    <List>
       {props.tasks.map((task) => (
         <TodoItem
           key={task.id}
@@ -14,7 +15,7 @@ const Tasks: React.FC<{ tasks: Todo[]; onUpdate: () => void }> = (props) => {
           onUpdate={props.onUpdate}
         />
       ))}
-    </ul>
+    </List>
   );
 };
 

@@ -1,12 +1,16 @@
 import { MetaResponse, Todo, TodoInfo } from "./interface";
+import axios from "axios";
+
+const apiUrl = 'https://easydev.club/api/v1/todos';
 
 export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | any> {
     try {
-        const response = await fetch(
-            `https://easydev.club/api/v1/todos?filter=${status}`
-        );
-        const resData = response.json();
-        return resData;
+        const response = await axios.get(apiUrl + `?filter${status}`, {
+            params: {
+                filter: status
+            }
+        })
+        return response.data;
     } catch (error) {
         alert("Ошибка: " + error);
     }
@@ -14,14 +18,11 @@ export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promi
 
 export async function addTask(inputValue: string) {
     try {
-        await fetch("https://easydev.club/api/v1/todos", {
-            method: "POST",
-            headers: { "Content-type": "application/json" },
-            body: JSON.stringify({
-                title: inputValue,
-                isDone: false,
-            }),
-        });
+        await axios.post(apiUrl, {
+            title: inputValue,
+            isDone: false,
+        })
+
     } catch (error) {
         alert("Ошибка: " + error);
     }
@@ -29,14 +30,8 @@ export async function addTask(inputValue: string) {
 
 export async function fetchEditTasksToDone(id: number, isDone: boolean) {
     try {
-        await fetch(`https://easydev.club/api/v1/todos/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-                isDone: isDone,
-            }),
+        await axios.put(apiUrl + `/${id}`, {
+            isDone: isDone,
         });
     } catch (error) {
         alert("Ошибка: " + error);
@@ -45,9 +40,7 @@ export async function fetchEditTasksToDone(id: number, isDone: boolean) {
 
 export async function deleteTask(id: number) {
     try {
-        await fetch(`https://easydev.club/api/v1/todos/${id}`, {
-            method: "DELETE",
-        });
+        await axios.delete(apiUrl + `/${id}`);
     } catch (error) {
         alert("Ошибка: " + error);
     }
@@ -55,15 +48,9 @@ export async function deleteTask(id: number) {
 
 export async function fetchEditTasksName(id: number, newTaskName: string) {
     try {
-        await fetch(`https://easydev.club/api/v1/todos/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-                title: newTaskName,
-            }),
-        });
+        await axios.put(apiUrl + `/${id}`, {
+            title: newTaskName,
+        })
     } catch (error) {
         alert("Ошибка: " + error);
     }

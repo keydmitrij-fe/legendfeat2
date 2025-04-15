@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { MetaResponse, Todo, TodoInfo } from "../api/interface.ts";
-import { fetchTasks } from "../api/api.ts";
+import { MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
+import { fetchTasks } from "../../api/api.ts";
 import "./TodoListPage.css";
-import Tabs from "../components/Tabs/Tabs.tsx";
-import TaskAdding from "../components/TaskAdding/TaskAdding.tsx";
-import Tasks from "../components/Tasks/Tasks.tsx";
+import Tabs from "../../components/Tabs/Tabs.tsx";
+import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";
+import Tasks from "../../components/Tasks/Tasks.tsx";
 
 const TodoListPage: React.FC = () => {
   const [tab, setTab] = useState<"all" | "completed" | "inWork">("all");
@@ -18,11 +18,16 @@ const TodoListPage: React.FC = () => {
   async function fetchData() {
     const resData: MetaResponse<Todo, TodoInfo> = await fetchTasks(tab);
     setTasks(resData.data);
+    console.log(resData);
     setQuantityTasks(resData.info!);
   }
 
   useEffect(() => {
+    let intervalId = setInterval(fetchData, 5000);
     fetchData();
+    return () => {
+      clearInterval(intervalId);
+    };
     // eslint-disable-next-line
   }, [tab]);
 
@@ -35,7 +40,7 @@ const TodoListPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div>
       <TaskAdding onUpdate={updateTaskList} />
       <div className="tabs-container">
         <Tabs
@@ -47,7 +52,7 @@ const TodoListPage: React.FC = () => {
       <div>
         <Tasks tasks={tasks} onUpdate={updateTaskList} />
       </div>
-    </>
+    </div>
   );
 };
 
