@@ -96,9 +96,19 @@ const TodoItem: React.FC<{
         >
           <Form.Item<FieldTaskName>
             name="taskName"
-            rules={[{ required: true, message: "Введите название задачи!" }]}
+            rules={[
+              {
+                min: 2,
+                max: 64,
+                message: "Название задачи должно быть от 2 до 64 символов!",
+              },
+              {
+                required: true,
+                message: "Введите название задачи",
+              },
+            ]}
           >
-            <Input minLength={2} maxLength={64} />
+            <Input />
           </Form.Item>
           <Form.Item label={null}>
             <Button type="primary" htmlType="submit">

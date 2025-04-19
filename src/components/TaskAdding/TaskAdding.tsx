@@ -38,12 +38,17 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
         name="taskName"
         rules={[
           {
+            min: 2,
+            max: 64,
+            message: "Название задачи должно быть от 2 до 64 символов!",
+          },
+          {
             required: true,
-            message: "Введите название задачи!",
+            message: "Введите название задачи",
           },
         ]}
       >
-        <Input minLength={2} maxLength={64} placeholder="Task To Be Done..." />
+        <Input placeholder="Task To Be Done..." />
       </Form.Item>
       <Form.Item label={null}>
         <Button type="primary" htmlType="submit">

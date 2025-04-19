@@ -1,25 +1,25 @@
 import { Button } from "antd";
 import { TodoInfo } from "../../api/interface";
 import "./Tabs.css";
+import { memo } from "react";
 
 const Tabs: React.FC<{
   onSelect: (tab: "all" | "completed" | "inWork") => void;
-  tabId: string;
   quantityTasks: TodoInfo;
-}> = (props) => {
+}> = memo(({ onSelect, quantityTasks }) => {
   return (
     <>
-      <Button onClick={() => props.onSelect("all")} type="text">
-        Все ({props.quantityTasks.all})
+      <Button onClick={() => onSelect("all")} type="text">
+        Все ({quantityTasks.all})
       </Button>
-      <Button onClick={() => props.onSelect("inWork")} type="text">
-        В работе ({props.quantityTasks.inWork})
+      <Button onClick={() => onSelect("inWork")} type="text">
+        В работе ({quantityTasks.inWork})
       </Button>
-      <Button onClick={() => props.onSelect("completed")} type="text">
-        Сделано ({props.quantityTasks.completed})
+      <Button onClick={() => onSelect("completed")} type="text">
+        Сделано ({quantityTasks.completed})
       </Button>
     </>
   );
-};
+});
 
 export default Tabs;

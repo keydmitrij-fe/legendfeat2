@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
 import { fetchTasks } from "../../api/api.ts";
 import "./TodoListPage.css";
@@ -15,12 +15,11 @@ const TodoListPage: React.FC = () => {
   });
   const [tasks, setTasks] = useState<Todo[]>([]);
 
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     const resData: MetaResponse<Todo, TodoInfo> = await fetchTasks(tab);
     setTasks(resData.data);
-    console.log(resData);
     setQuantityTasks(resData.info!);
-  }
+  }, [tab]);
 
   useEffect(() => {
     let intervalId = setInterval(fetchData, 5000);
@@ -31,26 +30,18 @@ const TodoListPage: React.FC = () => {
     // eslint-disable-next-line
   }, [tab]);
 
-  const handleClick = (tab: "all" | "completed" | "inWork") => {
+  const handleClick = useCallback((tab: "all" | "completed" | "inWork") => {
     setTab(tab);
-  };
-
-  const updateTaskList = async () => {
-    await fetchData();
-  };
+  }, []);
 
   return (
     <div>
-      <TaskAdding onUpdate={updateTaskList} />
+      <TaskAdding onUpdate={fetchData} />
       <div className="tabs-container">
-        <Tabs
-          tabId={tab}
-          quantityTasks={quantityTasks}
-          onSelect={handleClick}
-        />
+        <Tabs quantityTasks={quantityTasks} onSelect={handleClick} />
       </div>
       <div>
-        <Tasks tasks={tasks} onUpdate={updateTaskList} />
+        <Tasks tasks={tasks} onUpdate={fetchData} />
       </div>
     </div>
   );
