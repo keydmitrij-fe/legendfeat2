@@ -7,11 +7,11 @@ type MenuItem = Required<MenuProps>["items"][number];
 
 const items: MenuItem[] = [
   {
-    label: <NavLink to="/">Список задач</NavLink>,
+    label: <NavLink to="/todos">Список задач</NavLink>,
     key: "todoList",
   },
   {
-    label: <NavLink to="/profile">Профиль</NavLink>,
+    label: <NavLink to="/profile">Личный кабинет</NavLink>,
     key: "profile",
   },
 ];
