@@ -23,3 +23,6 @@ export interface MetaResponse<T, N> {
 		totalAmount: number
 	}
 }
+
+export type FieldTaskName = { taskName?: string }
+export type Filter = 'all' | 'completed' | 'inWork';

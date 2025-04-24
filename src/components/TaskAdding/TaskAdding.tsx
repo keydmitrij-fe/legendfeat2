@@ -1,58 +1,63 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { Form, Input, Button } from "antd";
+import type { FormProps } from "antd";
 import { addTask } from "../../api/api.ts";
 import "./TaskAdding.css";
-import {
-  MAXIMAL_TASK_LENGTH,
-  MINIMAL_TASK_LENGTH,
-} from "../../constants/constants.ts";
-import { TodoRequest } from "../../api/interface.ts";
+import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { memo } from "react";
 
-const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
-  const [inputValue, setInputValue] = useState<string>("");
+const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
+  const [form] = Form.useForm();
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!inputValue.length) {
-      return alert("Введите название задачи!");
-    }
-
-    if (
-      inputValue.length < MINIMAL_TASK_LENGTH ||
-      inputValue.length > MAXIMAL_TASK_LENGTH
-    ) {
-      return alert(
-        `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
-      );
-    }
+  const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
     const request: TodoRequest = {
-      title: inputValue,
+      title: value.taskName,
     };
     await addTask(request.title!);
-    props.onUpdate();
-    setInputValue("");
-  }
+    onUpdate();
+    form.resetFields();
+  };
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
-    setInputValue(event.target.value);
-  }
+  const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
+  };
 
   return (
-    <div>
-      <form className="main-form" onSubmit={handleSubmit}>
-        <input
-          id="main-input"
-          type="text"
-          className="input"
-          placeholder="Task To Be Done..."
-          onChange={handleChange}
-          value={inputValue}
-        />
-        <button type="submit" className="button">
+    <Form
+      name="basic"
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
+      style={{ maxWidth: 600 }}
+      initialValues={{ remember: true }}
+      onFinish={handleSubmit}
+      onFinishFailed={onFinishFailed}
+      autoComplete="off"
+      form={form}
+    >
+      <Form.Item<FieldTaskName>
+        name="taskName"
+        rules={[
+          {
+            min: 2,
+            max: 64,
+            message: "Название задачи должно быть от 2 до 64 символов!",
+          },
+          {
+            required: true,
+            message: "Введите название задачи",
+          },
+        ]}
+      >
+        <Input placeholder="Task To Be Done..." />
+      </Form.Item>
+      <Form.Item label={null}>
+        <Button type="primary" htmlType="submit">
           Add
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Form.Item>
+    </Form>
   );
-};
+});
 
 export default TaskAdding;

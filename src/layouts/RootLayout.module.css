@@ -1,0 +1,10 @@
+.main {
+    display: flex;
+    justify-content: center;
+}
+
+.menu {
+    position: relative;
+    left: 40px;
+    top: 80px;
+}

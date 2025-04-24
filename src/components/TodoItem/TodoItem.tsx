@@ -1,19 +1,18 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { List, Checkbox, Typography, Button, Form, Input } from "antd";
+import type { FormProps } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { EditFilled, DeleteFilled } from "@ant-design/icons";
+import { useState } from "react";
 import {
   fetchEditTasksToDone,
   deleteTask,
   fetchEditTasksName,
 } from "../../api/api.ts";
 import "./TodoItem.css";
-import saveIcon from "../../assets/icons/save-icon.png";
-import cancelIcon from "../../assets/icons/cancel-icon.png";
-import deleteIcon from "../../assets/icons/delete-icon.svg";
-import editIcon from "../../assets/icons/edit-icon.svg";
-import {
-  MINIMAL_TASK_LENGTH,
-  MAXIMAL_TASK_LENGTH,
-} from "../../constants/constants.ts";
-import { TodoRequest } from "../../api/interface.ts";
+import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { useForm } from "antd/es/form/Form";
+
+const { Text } = Typography;
 
 const TodoItem: React.FC<{
   taskId: number;
@@ -21,11 +20,11 @@ const TodoItem: React.FC<{
   taskTitle: string;
   onUpdate: () => void;
 }> = (props) => {
+  const [form] = useForm();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
     props.taskIsDone
   );
-  const [updateTaskName, setUpdateTaskName] = useState<string>();
 
   async function handleEditClickToDone() {
     setUpdateTaskStatus(!props.taskIsDone);
@@ -40,96 +39,91 @@ const TodoItem: React.FC<{
   }
 
   function handleEditClick() {
-    setUpdateTaskName(props.taskTitle);
+    form.setFieldValue("taskName", props.taskTitle);
     setIsEdit(true);
     props.onUpdate();
   }
 
   function handleCancelClick() {
-    setUpdateTaskName("");
+    form.setFieldValue("taskName", "");
     setIsEdit(false);
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!updateTaskName?.length) {
-      return alert("Введите название задачи!");
-    }
-
-    if (
-      updateTaskName.length < MINIMAL_TASK_LENGTH ||
-      updateTaskName.length > MAXIMAL_TASK_LENGTH
-    ) {
-      return alert(
-        `Длина введенных символов должна быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH}`
-      );
-    }
+  const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
     const request: TodoRequest = {
-      title: updateTaskName,
+      title: value.taskName,
     };
     await fetchEditTasksName(props.taskId, request.title!);
     setIsEdit(false);
     props.onUpdate();
-  }
+    form.resetFields();
+  };
+
+  const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
+  };
 
   return (
-    <li className="task-container">
-      <div className="checkbox-container">
-        <input
-          type="checkbox"
-          checked={updateTaskStatus}
-          onClick={handleEditClickToDone}
-          readOnly
-          className="checkbox"
-        />
-      </div>
+    <List.Item className="task-container">
+      <Checkbox
+        checked={updateTaskStatus}
+        onClick={handleEditClickToDone}
+      ></Checkbox>
       {!isEdit && (
         <>
           <div className="label-container">
-            <p
-              className={
-                updateTaskStatus === true ? "paragraph done" : "paragraph"
-              }
-              id="task-title"
-            >
-              {props.taskTitle}
-            </p>
+            {!updateTaskStatus && <Text>{props.taskTitle}</Text>}
+            {updateTaskStatus && <Text delete>{props.taskTitle}</Text>}
           </div>
-
-          <button type="button" className="edit" onClick={handleEditClick}>
-            <img src={editIcon} alt="icon edit" />
-          </button>
+          <Button type="primary" onClick={handleEditClick}>
+            <EditFilled />
+          </Button>
         </>
       )}
       {isEdit && (
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="label-container">
-            <input
-              className="edit-input"
-              value={updateTaskName}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setUpdateTaskName(e.target.value)
-              }
-            />
-          </div>
-          <div className="edit-buttons">
-            <button type="submit" className="save-button">
-              <img src={saveIcon} alt="save icon" className="image" />
-            </button>
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleCancelClick}
-            >
-              <img src={cancelIcon} alt="cancel icon" />
-            </button>
-          </div>
-        </form>
+        <Form
+          name="update"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          style={{ maxWidth: 600 }}
+          initialValues={{ remember: true }}
+          onFinish={handleSubmit}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+          form={form}
+        >
+          <Form.Item<FieldTaskName>
+            name="taskName"
+            rules={[
+              {
+                min: 2,
+                max: 64,
+                message: "Название задачи должно быть от 2 до 64 символов!",
+              },
+              {
+                required: true,
+                message: "Введите название задачи",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item label={null}>
+            <Button type="primary" htmlType="submit">
+              <CheckOutlined />
+            </Button>
+            <Button type="primary" onClick={handleCancelClick}>
+              <CloseOutlined />
+            </Button>
+          </Form.Item>
+        </Form>
       )}
-      <button type="button" className="delete" onClick={handleDelete}>
-        <img src={deleteIcon} alt="icon delete" />
-      </button>
-    </li>
+      <Button color="danger" variant="solid" onClick={handleDelete}>
+        <DeleteFilled />
+      </Button>
+    </List.Item>
   );
 };
 
