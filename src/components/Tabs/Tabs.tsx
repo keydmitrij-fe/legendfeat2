@@ -2,9 +2,10 @@ import { Button } from "antd";
 import { TodoInfo } from "../../api/interface";
 import "./Tabs.css";
 import { memo } from "react";
+import { Filter } from "../../api/interface";
 
 const Tabs: React.FC<{
-  onSelect: (tab: "all" | "completed" | "inWork") => void;
+  onSelect: (tab: Filter) => void;
   quantityTasks: TodoInfo;
 }> = memo(({ onSelect, quantityTasks }) => {
   return (

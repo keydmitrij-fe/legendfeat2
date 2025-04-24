@@ -68,4 +68,5 @@ export interface Token {
 }
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR'
-export type FieldTaskName = { taskName?: string } 
+export type FieldTaskName = { taskName?: string }
+export type Filter = 'all' | 'completed' | 'inWork'
