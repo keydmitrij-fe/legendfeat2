@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
+import { Filter, MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
 import { fetchTasks } from "../../api/api.ts";
 import "./TodoListPage.css";
 import Tabs from "../../components/Tabs/Tabs.tsx";
@@ -7,7 +7,7 @@ import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";
 import Tasks from "../../components/Tasks/Tasks.tsx";
 
 const TodoListPage: React.FC = () => {
-  const [tab, setTab] = useState<"all" | "completed" | "inWork">("all");
+  const [tab, setTab] = useState<Filter>("all");
   const [quantityTasks, setQuantityTasks] = useState<TodoInfo>({
     all: 0,
     completed: 0,
@@ -30,7 +30,7 @@ const TodoListPage: React.FC = () => {
     // eslint-disable-next-line
   }, [tab]);
 
-  const handleClick = useCallback((tab: "all" | "completed" | "inWork") => {
+  const handleClick = useCallback((tab: Filter) => {
     setTab(tab);
   }, []);
 

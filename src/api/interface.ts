@@ -24,4 +24,5 @@ export interface MetaResponse<T, N> {
 	}
 }
 
-export type FieldTaskName = { taskName?: string } 
+export type FieldTaskName = { taskName?: string }
+export type Filter = 'all' | 'completed' | 'inWork';

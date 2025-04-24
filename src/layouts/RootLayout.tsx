@@ -1,17 +1,47 @@
+import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
 import Navigation from "../components/Navigation/Navigation";
-import classes from ".//RootLayout.module.css";
+
+const { Sider, Content } = Layout;
+
+const contentStyle: React.CSSProperties = {
+  textAlign: "center",
+  marginTop: "12rem",
+  minHeight: 120,
+  marginLeft: "12rem",
+  lineHeight: "120px",
+  color: "#fff",
+  background: "#fff",
+};
+
+const siderStyle: React.CSSProperties = {
+  textAlign: "center",
+  marginTop: "15rem",
+  lineHeight: "120px",
+  color: "#fff",
+  background: "#fff",
+};
+
+const layoutStyle = {
+  borderRadius: 8,
+  overflow: "hidden",
+  width: "calc(70% - 8px)",
+  maxWidth: "calc(70% - 8px)",
+  background: "#fff",
+};
 
 const RootLayout: React.FC = () => {
   return (
-    <>
-      <section className={classes.menu}>
+    <Layout style={layoutStyle}>
+      <Sider width="25%" style={siderStyle}>
         <Navigation />
-      </section>
-      <section className={classes.main}>
-        <Outlet />
-      </section>
-    </>
+      </Sider>
+      <Layout style={layoutStyle}>
+        <Content style={contentStyle}>
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 

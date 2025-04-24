@@ -3,8 +3,9 @@ import type { FormProps } from "antd";
 import { addTask } from "../../api/api.ts";
 import "./TaskAdding.css";
 import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { memo } from "react";
 
-const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
+const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
   const [form] = Form.useForm();
 
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
@@ -12,7 +13,7 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
       title: value.taskName,
     };
     await addTask(request.title!);
-    props.onUpdate();
+    onUpdate();
     form.resetFields();
   };
 
@@ -57,6 +58,6 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = (props) => {
       </Form.Item>
     </Form>
   );
-};
+});
 
 export default TaskAdding;
