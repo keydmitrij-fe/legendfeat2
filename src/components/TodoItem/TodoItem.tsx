@@ -11,6 +11,10 @@ import {
 import "./TodoItem.css";
 import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
 import { useForm } from "antd/es/form/Form";
+import {
+  MAXIMAL_TASK_LENGTH,
+  MINIMAL_TASK_LENGTH,
+} from "../../constants/constants.ts";
 
 const { Text } = Typography;
 
@@ -98,8 +102,8 @@ const TodoItem: React.FC<{
             name="taskName"
             rules={[
               {
-                min: 2,
-                max: 64,
+                min: MINIMAL_TASK_LENGTH,
+                max: MAXIMAL_TASK_LENGTH,
                 message: "Название задачи должно быть от 2 до 64 символов!",
               },
               {

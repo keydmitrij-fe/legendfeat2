@@ -5,20 +5,19 @@ import { NavLink } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-const items: MenuItem[] = [
-  {
-    label: <NavLink to="/todos">Список задач</NavLink>,
-    key: "todoList",
-  },
-  {
-    label: <NavLink to="/profile">Личный кабинет</NavLink>,
-    key: "profile",
-  },
-];
-
 const Navigation: React.FC = () => {
   const [current, setCurrent] = useState("todoList");
 
+  const items: MenuItem[] = [
+    {
+      label: <NavLink to="/">Список задач</NavLink>,
+      key: "todoList",
+    },
+    {
+      label: <NavLink to="/profile">Личный кабинет</NavLink>,
+      key: "profile",
+    },
+  ];
   const onSelect: MenuProps["onClick"] = (event) => {
     setCurrent(event.key);
   };

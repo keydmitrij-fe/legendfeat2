@@ -4,6 +4,10 @@ import { addTask } from "../../api/api.ts";
 import "./TaskAdding.css";
 import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
 import { memo } from "react";
+import {
+  MAXIMAL_TASK_LENGTH,
+  MINIMAL_TASK_LENGTH,
+} from "../../constants/constants.ts";
 
 const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
   const [form] = Form.useForm();
@@ -39,8 +43,8 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
         name="taskName"
         rules={[
           {
-            min: 2,
-            max: 64,
+            min: MINIMAL_TASK_LENGTH,
+            max: MAXIMAL_TASK_LENGTH,
             message: "Название задачи должно быть от 2 до 64 символов!",
           },
           {

@@ -5,22 +5,26 @@ import ProfilePage from "./pages/Profile/ProfilePage.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
 import Authorization from "./pages/Authorization/Authorization.tsx";
 import Registration from "./pages/Registration/Registration.tsx";
+import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
+import { checkIsAuth, getTokens } from "./util/auth.ts";
 
 const router = createBrowserRouter([
   {
-    index: true,
-    element: <Authorization />,
-  },
-  {
-    path: "/registration",
-    element: <Registration />,
-  },
-  {
     path: "/",
     element: <RootLayout />,
+    loader: getTokens,
+    id: "root",
     children: [
-      { path: "todos", element: <TodoListPage /> },
-      { path: "profile", element: <ProfilePage /> },
+      { index: true, element: <TodoListPage />, loader: checkIsAuth },
+      { path: "profile", element: <ProfilePage />, loader: checkIsAuth },
+    ],
+  },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      { index: true, element: <Authorization /> },
+      { path: "registration", element: <Registration /> },
     ],
   },
 ]);

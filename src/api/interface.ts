@@ -63,10 +63,18 @@ export interface PasswordRequest {
 }
 
 export interface Token {
-	access: string
-	refresh: string
+	accessToken: string;
+	refreshToken: string;
 }
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR'
 export type FieldTaskName = { taskName?: string }
 export type Filter = 'all' | 'completed' | 'inWork'
+
+
+export interface ITokenInfo {
+	id: number;
+	isAdmin: string[];
+	userVersion: number;
+	exp: number;
+}
