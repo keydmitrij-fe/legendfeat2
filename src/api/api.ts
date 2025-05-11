@@ -1,4 +1,5 @@
 
+import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import { AuthData, MetaResponse, Todo, TodoInfo, UserRegistration } from "./interface";
 import axios from "axios";
 
@@ -10,9 +11,10 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`
+    // const accessToken = localStorage.getItem('accessToken');
+    // const accessToken = tokenUtil.getAccessToken();
+    if (tokenUtil.getAccessToken()) {
+        config.headers.Authorization = `Bearer ${tokenUtil.getAccessToken()}`
     }
     return config;
 })
@@ -100,7 +102,8 @@ export async function logoutUser() {
 export async function updateAccessToken() {
     try {
         const response = await api.post('/auth/refresh', { refreshToken: localStorage.getItem('refreshToken') });
-        localStorage.setItem('accessToken', response.data.accessToken)
+        // localStorage.setItem('accessToken', response.data.accessToken)
+        tokenUtil.setAccessToken(response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken)
         return response.data;
     }

@@ -1,12 +1,12 @@
 import { Layout } from "antd";
-import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation/Navigation";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { authActions } from "../store/AuthSlice";
 import { AppDispatch } from "../store";
 import { isTokenExpired, refreshAccessToken, removeTokens } from "../util/auth";
-import { Token } from "../api/interface";
+import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 
 const { Sider, Content } = Layout;
 
@@ -39,20 +39,26 @@ const layoutStyle = {
 const RootLayout: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const tokens: Token = useLoaderData();
+  // const tokens: Token = useLoaderData();
 
   useEffect(() => {
-    if (!tokens.refreshToken || isTokenExpired(tokens.refreshToken)) {
+    if (
+      !localStorage.getItem("refreshToken") ||
+      isTokenExpired(localStorage.getItem("refreshToken"))
+    ) {
       dispatch(authActions.logout());
       removeTokens();
       navigate("/auth");
       return;
     }
-    if (!tokens.accessToken || isTokenExpired(tokens.accessToken)) {
+    if (
+      !tokenUtil.getAccessToken() ||
+      isTokenExpired(tokenUtil.getAccessToken())
+    ) {
       refreshAccessToken();
     }
     dispatch(authActions.login());
-  }, [tokens, dispatch, navigate]);
+  }, [dispatch, navigate]);
   return (
     <Layout style={layoutStyle}>
       <Sider width="25%" style={siderStyle}>

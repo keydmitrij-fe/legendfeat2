@@ -1,32 +1,28 @@
 import { Menu } from "antd";
 import type { MenuProps } from "antd";
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 const Navigation: React.FC = () => {
-  const [current, setCurrent] = useState("todoList");
+  const location = useLocation();
 
   const items: MenuItem[] = [
     {
       label: <NavLink to="/">Список задач</NavLink>,
-      key: "todoList",
+      key: "/",
     },
     {
       label: <NavLink to="/profile">Личный кабинет</NavLink>,
-      key: "profile",
+      key: "/profile",
     },
   ];
-  const onSelect: MenuProps["onClick"] = (event) => {
-    setCurrent(event.key);
-  };
+
   return (
     <Menu
       style={{ width: 150 }}
-      onClick={onSelect}
       mode="vertical"
-      selectedKeys={[current]}
+      selectedKeys={[location.pathname]}
       items={items}
     />
   );

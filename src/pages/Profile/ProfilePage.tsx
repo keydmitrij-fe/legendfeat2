@@ -14,6 +14,8 @@ const ProfilePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  dispatch(authActions.login());
+
   const getUserData = useCallback(async () => {
     try {
       const resData = await getUserProfile();
@@ -21,6 +23,7 @@ const ProfilePage: React.FC = () => {
     } catch (error: any) {
       if (error.response.status === 401) {
         removeTokens();
+        dispatch(authActions.logout());
         navigate("/auth");
       } else {
         if (error.response.status >= 500) {
@@ -28,7 +31,7 @@ const ProfilePage: React.FC = () => {
         }
       }
     }
-  }, [navigate]);
+  }, [navigate, dispatch]);
 
   const handleLogout = async () => {
     try {

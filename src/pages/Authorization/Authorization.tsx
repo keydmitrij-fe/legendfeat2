@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
 import { authActions } from "../../store/AuthSlice";
 import { Typography } from "antd";
+import { tokenUtil } from "../../components/TokenUtil/tokenUtil";
 
 const { Title, Paragraph } = Typography;
 
@@ -53,7 +54,8 @@ const Authorization: React.FC = () => {
     try {
       const tokens: Token = await authUser(values);
 
-      localStorage.setItem("accessToken", tokens.accessToken);
+      // localStorage.setItem("accessToken", tokens.accessToken);
+      tokenUtil.setAccessToken(tokens.accessToken);
       localStorage.setItem("refreshToken", tokens.refreshToken);
 
       dispatch(authActions.login());
