@@ -12,10 +12,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    loader: checkIsAuth,
     id: "root",
     children: [
-      { index: true, element: <TodoListPage />, loader: checkIsAuth },
-      { path: "profile", element: <ProfilePage />, loader: checkIsAuth },
+      { index: true, element: <TodoListPage /> },
+      { path: "profile", element: <ProfilePage /> },
     ],
   },
   {

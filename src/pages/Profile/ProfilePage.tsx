@@ -24,14 +24,14 @@ const ProfilePage: React.FC = () => {
       if (error.response.status === 401) {
         removeTokens();
         dispatch(authActions.logout());
-        navigate("/auth");
+        // navigate("/auth");
       } else {
         if (error.response.status >= 500) {
-          alert("Ошибка со стороны сервера, попробуйте позже.");
+          alert("Ошибка на сервере сервера, попробуйте позже.");
         }
       }
     }
-  }, [navigate, dispatch]);
+  }, [dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -41,7 +41,7 @@ const ProfilePage: React.FC = () => {
       navigate("/auth");
     } catch (error: any) {
       if (error.response.status >= 500) {
-        alert("Ошибка со стороны сервера, попробуйте позже.");
+        alert("Ошибка на сервере сервера, попробуйте позже.");
       }
     }
   };

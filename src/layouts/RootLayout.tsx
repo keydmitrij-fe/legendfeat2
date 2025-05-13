@@ -1,10 +1,10 @@
 import { Layout } from "antd";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import Navigation from "../components/Navigation/Navigation";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../store/AuthSlice";
-import { AppDispatch } from "../store";
+import { AppDispatch, RootState } from "../store";
 import { isTokenExpired, refreshAccessToken, removeTokens } from "../util/auth";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 
@@ -39,37 +39,35 @@ const layoutStyle = {
 const RootLayout: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const isAuth = useSelector((state: RootState) => state.auth.isAuth);
   // const tokens: Token = useLoaderData();
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("refreshToken") ||
-      isTokenExpired(localStorage.getItem("refreshToken"))
-    ) {
+    if (!localStorage.getItem("refreshToken")) {
       dispatch(authActions.logout());
       removeTokens();
-      navigate("/auth");
+      // navigate("/auth");
       return;
     }
-    if (
-      !tokenUtil.getAccessToken() ||
-      isTokenExpired(tokenUtil.getAccessToken())
-    ) {
+    if (!tokenUtil.getAccessToken()) {
       refreshAccessToken();
     }
     dispatch(authActions.login());
   }, [dispatch, navigate]);
   return (
-    <Layout style={layoutStyle}>
-      <Sider width="25%" style={siderStyle}>
-        <Navigation />
-      </Sider>
+    <>
+      {!isAuth && <Navigate to="/auth" />}
       <Layout style={layoutStyle}>
-        <Content style={contentStyle}>
-          <Outlet />
-        </Content>
+        <Sider width="25%" style={siderStyle}>
+          <Navigation />
+        </Sider>
+        <Layout style={layoutStyle}>
+          <Content style={contentStyle}>
+            <Outlet />
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

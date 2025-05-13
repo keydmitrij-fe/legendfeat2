@@ -1,5 +1,5 @@
 class TokenUtil {
-    #accessToken: string = '';
+    #accessToken: string | null = null;
 
     setAccessToken(token: string) {
         this.#accessToken = token;
@@ -9,7 +9,7 @@ class TokenUtil {
         return this.#accessToken;
     }
     removeAccessToken() {
-        this.#accessToken = '';
+        this.#accessToken = null;
     }
 }
 
