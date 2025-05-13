@@ -1,5 +1,5 @@
 import { redirect } from "react-router-dom";
-import { ITokenInfo, RefreshToken } from "../api/interface";
+import { RefreshToken } from "../api/interface";
 import { AxiosPromise } from "axios";
 import { updateAccessToken } from "../api/api";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
@@ -13,11 +13,11 @@ import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 //     return tokens;
 // }
 
-export function checkAuthLoader() {
-    if (!localStorage.getItem('refreshToken')) {
-        return redirect('/auth')
-    }
-}
+// export function checkAuthLoader() {
+//     if (!localStorage.getItem('refreshToken')) {
+//         return redirect('/auth')
+//     }
+// }
 
 export function removeTokens() {
     // localStorage.removeItem('accessToken');
@@ -71,27 +71,27 @@ export function removeTokens() {
 //     }
 // }
 
-export const isTokenExpired = (token: string | null): boolean => {
-    if (!token) {
-        return true
-    }
-    try {
-        const tokenInfo = token.split('.')[1]
-        const tokenInfoDecoded = window.atob(tokenInfo);
-        const tokenInfoObj: ITokenInfo = JSON.parse(tokenInfoDecoded);
-        const tokenLeftTime = tokenInfoObj.exp - Math.round(+ new Date() / 1000);
+// export const isTokenExpired = (token: string | null): boolean => {
+//     if (!token) {
+//         return true
+//     }
+//     try {
+//         const tokenInfo = token.split('.')[1]
+//         const tokenInfoDecoded = window.atob(tokenInfo);
+//         const tokenInfoObj: ITokenInfo = JSON.parse(tokenInfoDecoded);
+//         const tokenLeftTime = tokenInfoObj.exp - Math.round(+ new Date() / 1000);
 
-        if (tokenLeftTime < 0) {
-            return true;
-        }
+//         if (tokenLeftTime < 0) {
+//             return true;
+//         }
 
-        return false;
+//         return false;
 
-    } catch (error: any) {
-        console.log(error);
-        return true;
-    }
-}
+//     } catch (error: any) {
+//         console.log(error);
+//         return true;
+//     }
+// }
 
 let refreshTokenRequest: AxiosPromise<RefreshToken> | null = null;
 

@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../store/AuthSlice";
 import { AppDispatch, RootState } from "../store";
-import { isTokenExpired, refreshAccessToken, removeTokens } from "../util/auth";
+import { refreshAccessToken, removeTokens } from "../util/auth";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 
 const { Sider, Content } = Layout;

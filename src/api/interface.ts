@@ -72,9 +72,9 @@ export type FieldTaskName = { taskName?: string }
 export type Filter = 'all' | 'completed' | 'inWork'
 
 
-export interface ITokenInfo {
-	id: number;
-	isAdmin: string[];
-	userVersion: number;
-	exp: number;
-}
+// export interface ITokenInfo {
+// 	id: number;
+// 	isAdmin: string[];
+// 	userVersion: number;
+// 	exp: number;
+// }
