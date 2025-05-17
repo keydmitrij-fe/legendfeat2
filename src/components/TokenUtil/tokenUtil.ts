@@ -5,7 +5,7 @@ class TokenUtil {
         this.#accessToken = token;
     };
 
-    getAccessToken() {
+    getAccessToken(): string | null {
         return this.#accessToken;
     }
     removeAccessToken() {

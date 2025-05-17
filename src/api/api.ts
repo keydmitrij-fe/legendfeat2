@@ -1,7 +1,11 @@
 
+import { redirect } from "react-router-dom";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import { AuthData, MetaResponse, Todo, TodoInfo, UserRegistration } from "./interface";
 import axios from "axios";
+import store from "../store";
+import { authActions } from "../store/AuthSlice";
+import { removeTokens } from "../util/auth";
 
 const api = axios.create({
     baseURL: "https://easydev.club/api/v1",
@@ -11,13 +15,47 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-    // const accessToken = localStorage.getItem('accessToken');
-    // const accessToken = tokenUtil.getAccessToken();
     if (tokenUtil.getAccessToken()) {
         config.headers.Authorization = `Bearer ${tokenUtil.getAccessToken()}`
     }
     return config;
-})
+}, error => Promise.reject(error))
+
+api.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+
+        if (originalRequest.url.includes('/refresh')) {
+            alert('Время сессии истекло, авторизуйтесь заново');
+            store.dispatch(authActions.logout())
+            removeTokens();
+            redirect('/auth')
+            return Promise.reject(error);
+        }
+
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                if (localStorage.getItem('refreshToken')) {
+                    await updateAccessToken();
+                }
+                originalRequest.headers['Authorization'] = `Bearer ${tokenUtil.getAccessToken()}`;
+                return api(originalRequest);
+            } catch (error: any) {
+                if (error.response.status === 401) {
+                    store.dispatch(authActions.logout())
+                    removeTokens();
+                    redirect('/auth')
+                    console.error('Время сессии истекло, авторизуйтесь заново');
+                }
+                return Promise.reject(error);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
 
 export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | any> {
     try {
@@ -102,7 +140,6 @@ export async function logoutUser() {
 export async function updateAccessToken() {
     try {
         const response = await api.post('/auth/refresh', { refreshToken: localStorage.getItem('refreshToken') });
-        // localStorage.setItem('accessToken', response.data.accessToken)
         tokenUtil.setAccessToken(response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken)
         return response.data;
@@ -112,7 +149,7 @@ export async function updateAccessToken() {
     }
 }
 
-export const getUserProfile = async () => {
+export async function getUserProfile() {
     try {
         const response = await api.get("/user/profile");
         return response.data;

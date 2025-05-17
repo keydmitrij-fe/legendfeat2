@@ -21,14 +21,10 @@ const ProfilePage: React.FC = () => {
       const resData = await getUserProfile();
       setUserData(resData);
     } catch (error: any) {
-      if (error.response.status === 401) {
+      if (error.response.status >= 500) {
         removeTokens();
         dispatch(authActions.logout());
-        // navigate("/auth");
-      } else {
-        if (error.response.status >= 500) {
-          alert("Ошибка на сервере сервера, попробуйте позже.");
-        }
+        alert("Ошибка на сервере сервера, попробуйте позже.");
       }
     }
   }, [dispatch]);

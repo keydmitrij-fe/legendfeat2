@@ -40,13 +40,11 @@ const RootLayout: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const isAuth = useSelector((state: RootState) => state.auth.isAuth);
-  // const tokens: Token = useLoaderData();
 
   useEffect(() => {
     if (!localStorage.getItem("refreshToken")) {
       dispatch(authActions.logout());
       removeTokens();
-      // navigate("/auth");
       return;
     }
     if (!tokenUtil.getAccessToken()) {
