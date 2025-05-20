@@ -39,7 +39,7 @@ export interface AuthData {
 }
 
 export interface RefreshToken {
-	refreshToken: string;
+	refreshToken: string | null;
 }
 
 export interface Profile {
@@ -70,11 +70,3 @@ export interface Token {
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR'
 export type FieldTaskName = { taskName?: string }
 export type Filter = 'all' | 'completed' | 'inWork'
-
-
-// export interface ITokenInfo {
-// 	id: number;
-// 	isAdmin: string[];
-// 	userVersion: number;
-// 	exp: number;
-// }

@@ -1,47 +1,30 @@
 import { redirect } from "react-router-dom";
-import { RefreshToken } from "../api/interface";
-import { AxiosPromise } from "axios";
-import { updateAccessToken } from "../api/api";
+import { updateAccessToken } from "../api/authApi";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
+import axios from "axios";
 
 export function removeTokens() {
     tokenUtil.removeAccessToken();
     localStorage.removeItem('refreshToken')
 }
 
-let refreshTokenRequest: AxiosPromise<RefreshToken> | null = null;
-
 export async function refreshAccessToken() {
-    try {
-        if (refreshTokenRequest === null) {
-            refreshTokenRequest = updateAccessToken();
-        }
-        const res = await refreshTokenRequest;
-        refreshTokenRequest = null;
-        return res.data;
-    } catch (error: any) {
-        if (error.response.status >= 500) {
-            alert("Ошибка со стороны сервера, попробуйте позже.");
-        }
-    }
-}
-
-export async function checkIsAuth() {
     if (localStorage.getItem('refreshToken')) {
         try {
-            if (refreshTokenRequest === null) {
-                refreshTokenRequest = updateAccessToken();
+            const data = await updateAccessToken();
+            tokenUtil.setAccessToken(data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken)
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const status = error.response?.status;
+                if (status === 500) {
+                    alert("Ошибка со стороны сервера, попробуйте позже.");
+                    redirect('/auth');
+                }
             }
-            const res = await refreshTokenRequest;
-            refreshTokenRequest = null;
-            return res.data;
-        } catch (error: any) {
-            if (error.response.status === 500) {
-                alert("Ошибка со стороны сервера, попробуйте позже.");
-                redirect('/auth');
-            }
+
         }
-    } else {
+    } else if (!localStorage.getItem('refreshToken')) {
         redirect('/auth');
     }
 }

@@ -4,7 +4,7 @@ import { NavLink, useLocation } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
-const Navigation: React.FC = () => {
+const SiderMenu: React.FC = () => {
   const location = useLocation();
 
   const items: MenuItem[] = [
@@ -28,4 +28,4 @@ const Navigation: React.FC = () => {
   );
 };
 
-export default Navigation;
+export default SiderMenu;

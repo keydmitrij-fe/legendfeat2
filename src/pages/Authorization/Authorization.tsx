@@ -13,42 +13,30 @@ import authImage from "../../assets/images/illustration.png";
 import logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthData, Token } from "../../api/interface";
-import { authUser } from "../../api/api";
+import { authUser } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
 import { authActions } from "../../store/AuthSlice";
 import { Typography } from "antd";
 import { tokenUtil } from "../../components/TokenUtil/tokenUtil";
+import axios from "axios";
 
 const { Title, Paragraph } = Typography;
 
 type NotificationPlacement = NotificationArgsProps["placement"];
-type NotificationType = "success" | "error";
 
 const Authorization: React.FC = () => {
   const navigator = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [api, contextHolder] = notification.useNotification();
 
-  const openNotification = (
-    placement: NotificationPlacement,
-    type: NotificationType
-  ) => {
-    if (type === "success") {
-      api[type]({
-        type: "success",
-        message: "Успешная авторизация!",
-        duration: 6,
-        placement,
-      });
-    } else {
-      api[type]({
-        type: "error",
-        message: "Неверный логин или пароль",
-        duration: 6,
-        placement,
-      });
-    }
+  const openNotification = (placement: NotificationPlacement) => {
+    api.error({
+      type: "error",
+      message: "Неверный логин или пароль",
+      duration: 6,
+      placement,
+    });
   };
   const onFinish = async (values: AuthData) => {
     try {
@@ -58,17 +46,17 @@ const Authorization: React.FC = () => {
       localStorage.setItem("refreshToken", tokens.refreshToken);
 
       dispatch(authActions.login());
-      openNotification("top", "success");
-      setTimeout(() => {
-        navigator("/");
-      }, 2000);
-    } catch (error: any) {
-      if (error.response.status >= 500) {
-        alert("Ошибка со стороны сервера, попробуйте позже.");
-        return;
-      }
-      if (error.response.status === 401) {
-        openNotification("top", "error");
+      navigator("/");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (status === 401) {
+          openNotification("top");
+        } else if (status && status >= 500) {
+          alert("Ошибка со стороны сервера, попробуйте позже.");
+          return;
+        }
       }
     }
   };

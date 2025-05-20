@@ -1,5 +1,5 @@
 import { Button, Typography } from "antd";
-import { getUserProfile, logoutUser } from "../../api/api";
+import { getUserProfile, logoutUser } from "../../api/authApi";
 import { useCallback, useEffect, useState } from "react";
 import { Profile } from "../../api/interface";
 import { removeTokens } from "../../util/auth";
@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
 import { authActions } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 const { Title, Paragraph } = Typography;
 
 const ProfilePage: React.FC = () => {
@@ -20,11 +21,14 @@ const ProfilePage: React.FC = () => {
     try {
       const resData = await getUserProfile();
       setUserData(resData);
-    } catch (error: any) {
-      if (error.response.status >= 500) {
-        removeTokens();
-        dispatch(authActions.logout());
-        alert("Ошибка на сервере сервера, попробуйте позже.");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status !== undefined && status >= 500) {
+          removeTokens();
+          dispatch(authActions.logout());
+          alert("Ошибка на сервере, попробуйте позже.");
+        }
       }
     }
   }, [dispatch]);
@@ -35,9 +39,11 @@ const ProfilePage: React.FC = () => {
       removeTokens();
       dispatch(authActions.logout());
       navigate("/auth");
-    } catch (error: any) {
-      if (error.response.status >= 500) {
-        alert("Ошибка на сервере сервера, попробуйте позже.");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status !== undefined && status >= 500)
+          alert("Ошибка на сервере сервера, попробуйте позже.");
       }
     }
   };

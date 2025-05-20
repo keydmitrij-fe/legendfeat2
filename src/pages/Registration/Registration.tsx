@@ -3,7 +3,7 @@ import logo from "../../assets/logo.png";
 import classes from "./Registration.module.css";
 import authImage from "../../assets/images/illustration.png";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../../api/api";
+import { registerUser } from "../../api/authApi";
 import { UserRegistration } from "../../api/interface";
 import { useState } from "react";
 import {
@@ -14,6 +14,7 @@ import {
   MINIMAL_PASSWORD_LENGTH,
   MINIMAL_USERNAME_LENGTH,
 } from "../../constants/constants";
+import axios from "axios";
 
 const { Title } = Typography;
 
@@ -27,14 +28,17 @@ const Registration: React.FC = () => {
     try {
       await registerUser(values);
       showModal();
-    } catch (error: any) {
-      if (error.response.status >= 500) {
-        alert("Ошибка со стороны сервера, попробуйте позже.");
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status !== undefined && status >= 500) {
+          alert("Ошибка со стороны сервера, попробуйте позже.");
+          return;
+        }
+        if (status === 409) {
+          showErrorModal();
+        }
       }
-      if (error.response.status === 409) {
-        showErrorModal();
-      }
-      console.log(error);
     }
   };
 

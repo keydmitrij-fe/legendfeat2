@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Filter, MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
-import { fetchTasks } from "../../api/api.ts";
+import { fetchTasks } from "../../api/todoApi.ts";
 import "./TodoListPage.css";
 import Tabs from "../../components/Tabs/Tabs.tsx";
 import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";

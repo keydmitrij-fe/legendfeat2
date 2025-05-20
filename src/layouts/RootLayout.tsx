@@ -1,6 +1,6 @@
 import { Layout } from "antd";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import Navigation from "../components/Navigation/Navigation";
+import SiderMenu from "../components/Menu/Menu";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../store/AuthSlice";
@@ -57,7 +57,7 @@ const RootLayout: React.FC = () => {
       {!isAuth && <Navigate to="/auth" />}
       <Layout style={layoutStyle}>
         <Sider width="25%" style={siderStyle}>
-          <Navigation />
+          <SiderMenu />
         </Sider>
         <Layout style={layoutStyle}>
           <Content style={contentStyle}>

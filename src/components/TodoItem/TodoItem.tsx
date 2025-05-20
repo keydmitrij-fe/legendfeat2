@@ -7,7 +7,7 @@ import {
   fetchEditTasksToDone,
   deleteTask,
   fetchEditTasksName,
-} from "../../api/api.ts";
+} from "../../api/todoApi.ts";
 import "./TodoItem.css";
 import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
 import { useForm } from "antd/es/form/Form";
@@ -33,7 +33,7 @@ const TodoItem: React.FC<{
   async function handleEditClickToDone() {
     setUpdateTaskStatus(!props.taskIsDone);
     const request: TodoRequest = { isDone: !updateTaskStatus };
-    await fetchEditTasksToDone(props.taskId, request.isDone!);
+    await fetchEditTasksToDone(props.taskId, request);
     props.onUpdate();
   }
 
@@ -57,7 +57,7 @@ const TodoItem: React.FC<{
     const request: TodoRequest = {
       title: value.taskName,
     };
-    await fetchEditTasksName(props.taskId, request.title!);
+    await fetchEditTasksName(props.taskId, request);
     setIsEdit(false);
     props.onUpdate();
     form.resetFields();

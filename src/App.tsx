@@ -6,13 +6,13 @@ import RootLayout from "./layouts/RootLayout.tsx";
 import Authorization from "./pages/Authorization/Authorization.tsx";
 import Registration from "./pages/Registration/Registration.tsx";
 import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
-import { checkIsAuth } from "./util/auth.ts";
+import { refreshAccessToken } from "./util/auth.ts";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-    loader: checkIsAuth,
+    loader: refreshAccessToken,
     id: "root",
     children: [
       { index: true, element: <TodoListPage /> },
