@@ -1,16 +1,7 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
-import { RootState } from "../../store";
+import { Outlet } from "react-router-dom";
 
 const AuthLayout: React.FC = () => {
-  const isAuth = useSelector((state: RootState) => state.auth.isAuth);
-
-  return (
-    <>
-      {isAuth && <Navigate to="/" />}
-      {!isAuth && <Outlet />}
-    </>
-  );
+  return <Outlet />;
 };
 
 export default AuthLayout;

@@ -13,13 +13,15 @@ import authImage from "../../assets/images/illustration.png";
 import logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthData, Token } from "../../api/interface";
-import { authUser } from "../../api/authApi";
+import { authUser, getUserProfile } from "../../api/authApi";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
-import { authActions } from "../../store/AuthSlice";
+import { authActions, profileActions } from "../../store/AuthSlice";
 import { Typography } from "antd";
 import { tokenUtil } from "../../components/TokenUtil/tokenUtil";
 import axios from "axios";
+import { useCallback } from "react";
+import { removeTokens } from "../../util/auth";
 
 const { Title, Paragraph } = Typography;
 
@@ -30,14 +32,34 @@ const Authorization: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [api, contextHolder] = notification.useNotification();
 
-  const openNotification = (placement: NotificationPlacement) => {
-    api.error({
-      type: "error",
-      message: "Неверный логин или пароль",
-      duration: 6,
-      placement,
-    });
-  };
+  const openNotification = useCallback(
+    (placement: NotificationPlacement, message: string) => {
+      api.error({
+        type: "error",
+        message: message,
+        duration: 6,
+        placement,
+      });
+    },
+    [api]
+  );
+
+  const getUserData = useCallback(async () => {
+    try {
+      const resData = await getUserProfile();
+      dispatch(profileActions.setProfileData(resData));
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status !== undefined && status >= 500) {
+          removeTokens();
+          dispatch(authActions.logout());
+          openNotification("top", "Ошибка на сервере, попробуйте позже.");
+        }
+      }
+    }
+  }, [dispatch, openNotification]);
+
   const onFinish = async (values: AuthData) => {
     try {
       const tokens: Token = await authUser(values);
@@ -46,15 +68,19 @@ const Authorization: React.FC = () => {
       localStorage.setItem("refreshToken", tokens.refreshToken);
 
       dispatch(authActions.login());
+      await getUserData();
       navigator("/");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
 
         if (status === 401) {
-          openNotification("top");
+          openNotification("top", "Неверный логин или пароль");
         } else if (status && status >= 500) {
-          alert("Ошибка со стороны сервера, попробуйте позже.");
+          openNotification(
+            "top",
+            "Ошибка со стороны сервера, попробуйте позже."
+          );
           return;
         }
       }

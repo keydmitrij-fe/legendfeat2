@@ -5,6 +5,7 @@ import store from "../store";
 import { authActions } from "../store/AuthSlice";
 import { removeTokens } from "../util/auth";
 import { updateAccessToken } from "./authApi";
+import { notification } from "antd";
 
 export const api = axios.create({
     baseURL: "https://easydev.club/api/v1",
@@ -12,6 +13,14 @@ export const api = axios.create({
         "Content-Type": "application/json",
     }
 })
+
+const showErrorNotification = (message: string, description?: string) => {
+    notification.error({
+        message,
+        description,
+        placement: "top",
+    });
+};
 
 api.interceptors.request.use((config) => {
     if (tokenUtil.getAccessToken()) {
@@ -26,7 +35,7 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         if (originalRequest.url.includes('/refresh')) {
-            alert('Время сессии истекло, авторизуйтесь заново');
+            showErrorNotification('Ошибка', 'Время сессии истекло, авторизуйтесь заново');
             store.dispatch(authActions.logout())
             removeTokens();
             redirect('/auth')
@@ -48,7 +57,7 @@ api.interceptors.response.use(
                     store.dispatch(authActions.logout())
                     removeTokens();
                     redirect('/auth')
-                    console.error('Время сессии истекло, авторизуйтесь заново');
+                    showErrorNotification('Ошибка', 'Время сессии истекло, авторизуйтесь заново');
                 }
                 return Promise.reject(error);
             }

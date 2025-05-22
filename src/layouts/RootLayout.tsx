@@ -1,12 +1,15 @@
-import { Layout } from "antd";
+import { Layout, Spin } from "antd";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import SiderMenu from "../components/Menu/Menu";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { authActions } from "../store/AuthSlice";
+import { authActions, profileActions } from "../store/AuthSlice";
 import { AppDispatch, RootState } from "../store";
 import { refreshAccessToken, removeTokens } from "../util/auth";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
+import axios from "axios";
+import { getUserProfile } from "../api/authApi";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const { Sider, Content } = Layout;
 
@@ -40,21 +43,63 @@ const RootLayout: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const isAuth = useSelector((state: RootState) => state.auth.isAuth);
+  const isInitAuthEnded = useSelector(
+    (state: RootState) => state.auth.isInitAuthEnded
+  );
 
   useEffect(() => {
-    if (!localStorage.getItem("refreshToken")) {
-      dispatch(authActions.logout());
-      removeTokens();
-      return;
-    }
-    if (!tokenUtil.getAccessToken()) {
-      refreshAccessToken();
-    }
-    dispatch(authActions.login());
+    const initAuth = async () => {
+      if (!localStorage.getItem("refreshToken")) {
+        dispatch(authActions.logout());
+        removeTokens();
+        navigate("/auth");
+        return;
+      }
+
+      if (!tokenUtil.getAccessToken()) {
+        try {
+          await refreshAccessToken();
+          if (!tokenUtil.getAccessToken())
+            throw new Error("Ошибка обновления токена");
+        } catch (error: unknown) {
+          dispatch(authActions.logout());
+          removeTokens();
+          navigate("/auth");
+          return;
+        }
+      }
+
+      try {
+        const profileData = await getUserProfile();
+        dispatch(profileActions.setProfileData(profileData));
+        dispatch(authActions.login());
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          dispatch(authActions.logout());
+          dispatch(profileActions.clearProfileData());
+          removeTokens();
+          navigate("/auth");
+        }
+      } finally {
+        dispatch(authActions.setInitAuthEnded());
+      }
+    };
+
+    initAuth();
   }, [dispatch, navigate]);
+  if (!isInitAuthEnded) {
+    return (
+      <Spin
+        fullscreen
+        indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />}
+      />
+    );
+  }
+  if (!isAuth) {
+    return <Navigate to="/auth" />;
+  }
   return (
     <>
-      {!isAuth && <Navigate to="/auth" />}
       <Layout style={layoutStyle}>
         <Sider width="25%" style={siderStyle}>
           <SiderMenu />

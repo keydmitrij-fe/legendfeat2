@@ -1,6 +1,14 @@
+import { notification } from "antd";
 import { api } from "./api";
 import { MetaResponse, Todo, TodoInfo, TodoRequest } from "./interface";
 
+const showErrorNotification = (message: string, description?: string) => {
+    notification.error({
+        message,
+        description,
+        placement: "top",
+    });
+};
 
 export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | unknown> {
     try {
@@ -11,7 +19,7 @@ export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promi
         })
         return response.data;
     } catch (error: unknown) {
-        alert("Ошибка: " + error);
+        showErrorNotification("Ошибка: ", `${error}`);
     }
 }
 
@@ -23,7 +31,7 @@ export async function addTask(inputValue: string): Promise<Todo | unknown> {
         })
         return response.data;
     } catch (error: unknown) {
-        alert("Ошибка: " + error);
+        showErrorNotification("Ошибка: ", `${error}`);
     }
 }
 
@@ -34,7 +42,7 @@ export async function fetchEditTasksToDone(id: number, task: TodoRequest): Promi
         });
         return response.data;
     } catch (error: unknown) {
-        alert("Ошибка: " + error);
+        showErrorNotification("Ошибка: ", `${error}`);
     }
 }
 
@@ -43,7 +51,7 @@ export async function deleteTask(id: number): Promise<Todo | unknown> {
         const response = await api.delete(`/todos/${id}`);
         return response.data;
     } catch (error: unknown) {
-        alert("Ошибка: " + error);
+        showErrorNotification("Ошибка: ", `${error}`);
     }
 }
 
@@ -54,6 +62,6 @@ export async function fetchEditTasksName(id: number, task: TodoRequest): Promise
         })
         return response;
     } catch (error: unknown) {
-        alert("Ошибка: " + error);
+        showErrorNotification("Ошибка: ", `${error}`);
     }
 }

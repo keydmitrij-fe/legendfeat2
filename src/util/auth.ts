@@ -2,6 +2,15 @@ import { redirect } from "react-router-dom";
 import { updateAccessToken } from "../api/authApi";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import axios from "axios";
+import { notification } from "antd";
+
+const showErrorNotification = (message: string, description?: string) => {
+    notification.error({
+        message,
+        description,
+        placement: "top",
+    });
+};
 
 export function removeTokens() {
     tokenUtil.removeAccessToken();
@@ -18,7 +27,7 @@ export async function refreshAccessToken() {
             if (axios.isAxiosError(error)) {
                 const status = error.response?.status;
                 if (status === 500) {
-                    alert("Ошибка со стороны сервера, попробуйте позже.");
+                    showErrorNotification('Ошибка', "Ошибка со стороны сервера, попробуйте позже.");
                     redirect('/auth');
                 }
             }

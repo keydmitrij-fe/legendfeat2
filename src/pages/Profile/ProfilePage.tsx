@@ -1,66 +1,58 @@
-import { Button, Typography } from "antd";
-import { getUserProfile, logoutUser } from "../../api/authApi";
-import { useCallback, useEffect, useState } from "react";
+import { Button, notification, NotificationArgsProps, Typography } from "antd";
+import { logoutUser } from "../../api/authApi";
 import { Profile } from "../../api/interface";
 import { removeTokens } from "../../util/auth";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store";
-import { authActions } from "../../store/AuthSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { authActions, profileActions } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+type NotificationPlacement = NotificationArgsProps["placement"];
 const { Title, Paragraph } = Typography;
 
 const ProfilePage: React.FC = () => {
-  const [userData, setUserData] = useState<Profile>();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const userData: Profile = useSelector((state: RootState) => state.profile);
+  const [api, contextHolder] = notification.useNotification();
 
-  dispatch(authActions.login());
-
-  const getUserData = useCallback(async () => {
-    try {
-      const resData = await getUserProfile();
-      setUserData(resData);
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        if (status !== undefined && status >= 500) {
-          removeTokens();
-          dispatch(authActions.logout());
-          alert("Ошибка на сервере, попробуйте позже.");
-        }
-      }
-    }
-  }, [dispatch]);
+  const openNotification = (
+    placement: NotificationPlacement,
+    message: string
+  ) => {
+    api.error({
+      type: "error",
+      message: message,
+      duration: 6,
+      placement,
+    });
+  };
 
   const handleLogout = async () => {
     try {
       await logoutUser();
       removeTokens();
+      dispatch(profileActions.clearProfileData());
       dispatch(authActions.logout());
       navigate("/auth");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status !== undefined && status >= 500)
-          alert("Ошибка на сервере сервера, попробуйте позже.");
+          openNotification("top", "Ошибка на сервере, попробуйте позже.");
       }
     }
   };
-  useEffect(() => {
-    getUserData();
-  }, [getUserData]);
 
   return (
     <>
+      {contextHolder}
       <Title>Привет</Title>
-      <Paragraph>Имя пользователя: {userData?.username}</Paragraph>
-      <Paragraph>Email: {userData?.email}</Paragraph>
-      {!userData?.phoneNumber && (
-        <Paragraph>Номер телефона не указан</Paragraph>
-      )}
+      <Paragraph>Имя пользователя: {userData.username}</Paragraph>
+      <Paragraph>Email: {userData.email}</Paragraph>
+      {!userData.phoneNumber && <Paragraph>Номер телефона не указан</Paragraph>}
       {userData?.phoneNumber && (
-        <Paragraph>Номер телефона: {userData?.phoneNumber}</Paragraph>
+        <Paragraph>Номер телефона: {userData.phoneNumber}</Paragraph>
       )}
       <Button onClick={handleLogout}>Выход из аккаунта</Button>
     </>

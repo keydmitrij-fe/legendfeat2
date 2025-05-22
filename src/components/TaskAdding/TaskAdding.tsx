@@ -1,5 +1,5 @@
-import { Form, Input, Button } from "antd";
-import type { FormProps } from "antd";
+import { Form, Input, Button, notification } from "antd";
+import type { FormProps, NotificationArgsProps } from "antd";
 import { addTask } from "../../api/todoApi.ts";
 import "./TaskAdding.css";
 import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
@@ -8,9 +8,23 @@ import {
   MAXIMAL_TASK_LENGTH,
   MINIMAL_TASK_LENGTH,
 } from "../../constants/constants.ts";
+type NotificationPlacement = NotificationArgsProps["placement"];
 
 const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
   const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
+
+  const openNotification = (
+    placement: NotificationPlacement,
+    message: string
+  ) => {
+    api.error({
+      type: "error",
+      message: message,
+      duration: 6,
+      placement,
+    });
+  };
 
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
     const request: TodoRequest = {
@@ -24,43 +38,46 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
     errorInfo
   ) => {
-    console.log("Failed:", errorInfo);
+    openNotification("top", `Failed: ${errorInfo}`);
   };
 
   return (
-    <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      style={{ maxWidth: 600 }}
-      initialValues={{ remember: true }}
-      onFinish={handleSubmit}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
-      form={form}
-    >
-      <Form.Item<FieldTaskName>
-        name="taskName"
-        rules={[
-          {
-            min: MINIMAL_TASK_LENGTH,
-            max: MAXIMAL_TASK_LENGTH,
-            message: "Название задачи должно быть от 2 до 64 символов!",
-          },
-          {
-            required: true,
-            message: "Введите название задачи",
-          },
-        ]}
+    <>
+      {contextHolder}
+      <Form
+        name="basic"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        style={{ maxWidth: 600 }}
+        initialValues={{ remember: true }}
+        onFinish={handleSubmit}
+        onFinishFailed={onFinishFailed}
+        autoComplete="off"
+        form={form}
       >
-        <Input placeholder="Task To Be Done..." />
-      </Form.Item>
-      <Form.Item label={null}>
-        <Button type="primary" htmlType="submit">
-          Add
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item<FieldTaskName>
+          name="taskName"
+          rules={[
+            {
+              min: MINIMAL_TASK_LENGTH,
+              max: MAXIMAL_TASK_LENGTH,
+              message: `Название задачи должно быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH} символов!`,
+            },
+            {
+              required: true,
+              message: "Введите название задачи",
+            },
+          ]}
+        >
+          <Input placeholder="Task To Be Done..." />
+        </Form.Item>
+        <Form.Item label={null}>
+          <Button type="primary" htmlType="submit">
+            Add
+          </Button>
+        </Form.Item>
+      </Form>
+    </>
   );
 });
 
