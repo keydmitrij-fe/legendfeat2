@@ -3,9 +3,9 @@ import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import axios from "axios";
 import store from "../store";
 import { authActions } from "../store/AuthSlice";
-import { removeTokens } from "../util/auth";
 import { updateAccessToken } from "./authApi";
 import { notification } from "antd";
+import { removeTokens } from "../store/authAction";
 
 export const api = axios.create({
     baseURL: "https://easydev.club/api/v1",

@@ -5,11 +5,10 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions, profileActions } from "../store/AuthSlice";
 import { AppDispatch, RootState } from "../store";
-import { refreshAccessToken, removeTokens } from "../util/auth";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import axios from "axios";
-import { getUserProfile } from "../api/authApi";
 import { LoadingOutlined } from "@ant-design/icons";
+import { getProfile, refreshToken, removeTokens } from "../store/authAction";
 
 const { Sider, Content } = Layout;
 
@@ -58,7 +57,7 @@ const RootLayout: React.FC = () => {
 
       if (!tokenUtil.getAccessToken()) {
         try {
-          await refreshAccessToken();
+          await dispatch(refreshToken());
           if (!tokenUtil.getAccessToken())
             throw new Error("Ошибка обновления токена");
         } catch (error: unknown) {
@@ -70,7 +69,7 @@ const RootLayout: React.FC = () => {
       }
 
       try {
-        const profileData = await getUserProfile();
+        const profileData = await dispatch(getProfile()).unwrap();
         dispatch(profileActions.setProfileData(profileData));
         dispatch(authActions.login());
       } catch (error: unknown) {

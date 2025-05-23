@@ -1,12 +1,12 @@
 import { Button, notification, NotificationArgsProps, Typography } from "antd";
 import { logoutUser } from "../../api/authApi";
 import { Profile } from "../../api/interface";
-import { removeTokens } from "../../util/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { authActions, profileActions } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { removeTokens } from "../../store/authAction";
 type NotificationPlacement = NotificationArgsProps["placement"];
 const { Title, Paragraph } = Typography;
 

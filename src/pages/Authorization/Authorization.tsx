@@ -12,16 +12,14 @@ import classes from "./Authorization.module.css";
 import authImage from "../../assets/images/illustration.png";
 import logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthData, Token } from "../../api/interface";
-import { authUser, getUserProfile } from "../../api/authApi";
+import { AuthData } from "../../api/interface";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
 import { authActions, profileActions } from "../../store/AuthSlice";
 import { Typography } from "antd";
-import { tokenUtil } from "../../components/TokenUtil/tokenUtil";
 import axios from "axios";
 import { useCallback } from "react";
-import { removeTokens } from "../../util/auth";
+import { getProfile, login, removeTokens } from "../../store/authAction";
 
 const { Title, Paragraph } = Typography;
 
@@ -46,7 +44,7 @@ const Authorization: React.FC = () => {
 
   const getUserData = useCallback(async () => {
     try {
-      const resData = await getUserProfile();
+      const resData = await dispatch(getProfile()).unwrap();
       dispatch(profileActions.setProfileData(resData));
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -62,21 +60,17 @@ const Authorization: React.FC = () => {
 
   const onFinish = async (values: AuthData) => {
     try {
-      const tokens: Token = await authUser(values);
-
-      tokenUtil.setAccessToken(tokens.accessToken);
-      localStorage.setItem("refreshToken", tokens.refreshToken);
-
+      await dispatch(login(values)).unwrap();
       dispatch(authActions.login());
       await getUserData();
       navigator("/");
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const status = error.status;
 
         if (status === 401) {
           openNotification("top", "Неверный логин или пароль");
-        } else if (status && status >= 500) {
+        } else if (status && status === 500) {
           openNotification(
             "top",
             "Ошибка со стороны сервера, попробуйте позже."
