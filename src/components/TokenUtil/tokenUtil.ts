@@ -1,11 +1,11 @@
 class TokenUtil {
     #accessToken: string | null = null;
 
-    setAccessToken(token: string) {
+    set AccessToken(token: string) {
         this.#accessToken = token;
     };
 
-    getAccessToken(): string | null {
+    get AccessToken(): string | null {
         return this.#accessToken;
     }
     removeAccessToken() {

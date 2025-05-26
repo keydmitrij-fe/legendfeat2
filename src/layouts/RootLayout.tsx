@@ -51,19 +51,19 @@ const RootLayout: React.FC = () => {
       if (!localStorage.getItem("refreshToken")) {
         dispatch(authActions.logout());
         removeTokens();
-        navigate("/auth");
+        navigate("/auth/login");
         return;
       }
 
-      if (!tokenUtil.getAccessToken()) {
+      if (!tokenUtil.AccessToken) {
         try {
           await dispatch(refreshToken());
-          if (!tokenUtil.getAccessToken())
+          if (!tokenUtil.AccessToken)
             throw new Error("Ошибка обновления токена");
         } catch (error: unknown) {
           dispatch(authActions.logout());
           removeTokens();
-          navigate("/auth");
+          navigate("/auth/login");
           return;
         }
       }
@@ -77,7 +77,7 @@ const RootLayout: React.FC = () => {
           dispatch(authActions.logout());
           dispatch(profileActions.clearProfileData());
           removeTokens();
-          navigate("/auth");
+          navigate("/auth/login");
         }
       } finally {
         dispatch(authActions.setInitAuthEnded());
@@ -95,7 +95,7 @@ const RootLayout: React.FC = () => {
     );
   }
   if (!isAuth) {
-    return <Navigate to="/auth" />;
+    return <Navigate to="/auth/login" />;
   }
   return (
     <>

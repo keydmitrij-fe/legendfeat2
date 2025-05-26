@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { AuthData, Profile, RefreshToken, Token } from "../api/interface";
+import { AuthData, Profile, RefreshToken, Token } from "../types/authTypes";
 import { authUser, getUserProfile, updateAccessToken } from "../api/authApi";
 import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import axios from "axios";
@@ -11,7 +11,7 @@ export const login = createAsyncThunk<
 >('auth/login', async (authData, thunkAPI) => {
     try {
         const tokens = await authUser(authData);
-        tokenUtil.setAccessToken(tokens.accessToken);
+        tokenUtil.AccessToken = tokens.accessToken;
         localStorage.setItem("refreshToken", tokens.refreshToken);
         return tokens;
     } catch (error: unknown) {
@@ -36,7 +36,7 @@ export const refreshToken = createAsyncThunk<
     }
     try {
         const tokens = await updateAccessToken();
-        tokenUtil.setAccessToken(tokens.accessToken);
+        tokenUtil.AccessToken = tokens.accessToken;
         localStorage.setItem('refreshToken', tokens.refreshToken)
         return tokens;
     } catch (error: unknown) {

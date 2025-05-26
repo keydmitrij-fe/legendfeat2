@@ -1,6 +1,6 @@
 import { notification } from "antd";
 import { api } from "./api";
-import { MetaResponse, Todo, TodoInfo, TodoRequest } from "./interface";
+import { Filter, MetaResponse, Todo, TodoInfo, TodoRequest } from "../types/todoTypes";
 
 const showErrorNotification = (message: string, description?: string) => {
     notification.error({
@@ -10,7 +10,7 @@ const showErrorNotification = (message: string, description?: string) => {
     });
 };
 
-export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | unknown> {
+export async function fetchTasks(status?: Filter): Promise<MetaResponse<Todo, TodoInfo> | unknown> {
     try {
         const response = await api.get('/todos', {
             params: {

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { AuthData, Profile, RefreshToken, Token, UserRegistration } from "./interface";
+import { AuthData, Profile, RefreshToken, Token, UserRegistration } from "../types/authTypes";
 
 export async function registerUser(registerData: UserRegistration): Promise<Profile> {
     try {

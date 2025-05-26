@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Profile } from "../api/interface";
+import { Profile } from "../types/authTypes";
 
 const initialAuthState = { isAuth: false, isInitAuthEnded: false };
 const initialProfileState: Profile = {

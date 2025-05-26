@@ -17,7 +17,7 @@ import {
   fetchEditTasksName,
 } from "../../api/todoApi.ts";
 import "./TodoItem.css";
-import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { TodoRequest, FieldTaskName } from "../../types/todoTypes.ts";
 import { useForm } from "antd/es/form/Form";
 import {
   MAXIMAL_TASK_LENGTH,

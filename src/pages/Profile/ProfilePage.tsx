@@ -1,6 +1,6 @@
 import { Button, notification, NotificationArgsProps, Typography } from "antd";
 import { logoutUser } from "../../api/authApi";
-import { Profile } from "../../api/interface";
+import { Profile } from "../../types/authTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { authActions, profileActions } from "../../store/AuthSlice";
@@ -34,7 +34,7 @@ const ProfilePage: React.FC = () => {
       removeTokens();
       dispatch(profileActions.clearProfileData());
       dispatch(authActions.logout());
-      navigate("/auth");
+      navigate("/auth/login");
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;

@@ -2,7 +2,7 @@ import { Form, Input, Button, notification } from "antd";
 import type { FormProps, NotificationArgsProps } from "antd";
 import { addTask } from "../../api/todoApi.ts";
 import "./TaskAdding.css";
-import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { TodoRequest, FieldTaskName } from "../../types/todoTypes.ts";
 import { memo } from "react";
 import {
   MAXIMAL_TASK_LENGTH,

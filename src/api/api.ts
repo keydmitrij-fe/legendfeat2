@@ -23,8 +23,8 @@ const showErrorNotification = (message: string, description?: string) => {
 };
 
 api.interceptors.request.use((config) => {
-    if (tokenUtil.getAccessToken()) {
-        config.headers.Authorization = `Bearer ${tokenUtil.getAccessToken()}`
+    if (tokenUtil.AccessToken) {
+        config.headers.Authorization = `Bearer ${tokenUtil.AccessToken}`
     }
     return config;
 }, error => Promise.reject(error))
@@ -47,10 +47,10 @@ api.interceptors.response.use(
             try {
                 if (localStorage.getItem('refreshToken')) {
                     const data = await updateAccessToken();
-                    tokenUtil.setAccessToken(data.accessToken);
+                    tokenUtil.AccessToken = data.accessToken;
                     localStorage.setItem('refreshToken', data.refreshToken)
                 }
-                originalRequest.headers['Authorization'] = `Bearer ${tokenUtil.getAccessToken()}`;
+                originalRequest.headers['Authorization'] = `Bearer ${tokenUtil.AccessToken}`;
                 return api(originalRequest);
             } catch (error: unknown) {
                 if (axios.isAxiosError(error) && error.response?.status === 401) {
