@@ -1,7 +1,7 @@
 import { List } from "antd";
 import "./Tasks.css";
 import TodoItem from "../TodoItem/TodoItem.tsx";
-import { Todo } from "../../api/interface";
+import { Todo } from "../../types/todoTypes.ts";
 import { memo } from "react";
 
 const Tasks: React.FC<{ tasks: Todo[]; onUpdate: () => void }> = memo(

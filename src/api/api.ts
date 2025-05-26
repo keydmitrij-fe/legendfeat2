@@ -1,60 +1,71 @@
-
-import { MetaResponse, Todo, TodoInfo } from "./interface";
+import { redirect } from "react-router-dom";
+import { tokenUtil } from "../components/TokenUtil/tokenUtil";
 import axios from "axios";
+import store from "../store";
+import { authActions } from "../store/AuthSlice";
+import { updateAccessToken } from "./authApi";
+import { notification } from "antd";
+import { removeTokens } from "../store/authAction";
 
-const api = axios.create({
+export const api = axios.create({
     baseURL: "https://easydev.club/api/v1",
+    headers: {
+        "Content-Type": "application/json",
+    }
 })
 
-export async function fetchTasks(status?: 'all' | 'completed' | 'inWork'): Promise<MetaResponse<Todo, TodoInfo> | any> {
-    try {
-        const response = await api.get('/todos', {
-            params: {
-                filter: status
+const showErrorNotification = (message: string, description?: string) => {
+    notification.error({
+        message,
+        description,
+        placement: "top",
+    });
+};
+
+api.interceptors.request.use((config) => {
+    if (tokenUtil.AccessToken) {
+        config.headers.Authorization = `Bearer ${tokenUtil.AccessToken}`
+    }
+    return config;
+}, error => Promise.reject(error))
+
+api.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+
+        if (originalRequest.url.includes('/refresh')) {
+            showErrorNotification('Ошибка', 'Время сессии истекло, авторизуйтесь заново');
+            store.dispatch(authActions.logout())
+            removeTokens();
+            redirect('/auth')
+            return Promise.reject(error);
+        }
+
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            try {
+                if (localStorage.getItem('refreshToken')) {
+                    const data = await updateAccessToken();
+                    tokenUtil.AccessToken = data.accessToken;
+                    localStorage.setItem('refreshToken', data.refreshToken)
+                }
+                originalRequest.headers['Authorization'] = `Bearer ${tokenUtil.AccessToken}`;
+                return api(originalRequest);
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    store.dispatch(authActions.logout())
+                    removeTokens();
+                    redirect('/auth')
+                    showErrorNotification('Ошибка', 'Время сессии истекло, авторизуйтесь заново');
+                }
+                return Promise.reject(error);
             }
-        })
-        return response.data;
-    } catch (error) {
-        alert("Ошибка: " + error);
-    }
-}
+        }
 
-export async function addTask(inputValue: string) {
-    try {
-        await api.post('/todos', {
-            title: inputValue,
-            isDone: false,
-        })
-
-    } catch (error) {
-        alert("Ошибка: " + error);
+        return Promise.reject(error);
     }
-}
+);
 
-export async function fetchEditTasksToDone(id: number, isDone: boolean) {
-    try {
-        await api.put(`/todos/${id}`, {
-            isDone: isDone,
-        });
-    } catch (error) {
-        alert("Ошибка: " + error);
-    }
-}
 
-export async function deleteTask(id: number) {
-    try {
-        await api.delete(`/todos/${id}`);
-    } catch (error) {
-        alert("Ошибка: " + error);
-    }
-}
 
-export async function fetchEditTasksName(id: number, newTaskName: string) {
-    try {
-        await api.put(`/todos/${id}`, {
-            title: newTaskName,
-        })
-    } catch (error) {
-        alert("Ошибка: " + error);
-    }
-}

@@ -3,14 +3,26 @@ import "./App.css";
 import TodoListPage from "./pages/TodoList/TodoListPage.tsx";
 import ProfilePage from "./pages/Profile/ProfilePage.tsx";
 import RootLayout from "./layouts/RootLayout.tsx";
+import Authorization from "./pages/Authorization/Authorization.tsx";
+import Registration from "./pages/Registration/Registration.tsx";
+import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
+    id: "root",
     children: [
       { index: true, element: <TodoListPage /> },
       { path: "profile", element: <ProfilePage /> },
+    ],
+  },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      { index: true, path: "login", element: <Authorization /> },
+      { path: "registration", element: <Registration /> },
     ],
   },
 ]);

@@ -1,8 +1,8 @@
 import { Button } from "antd";
-import { TodoInfo } from "../../api/interface";
+import { TodoInfo } from "../../types/todoTypes";
 import "./Tabs.css";
 import { memo } from "react";
-import { Filter } from "../../api/interface";
+import { Filter } from "../../types/todoTypes";
 
 const Tabs: React.FC<{
   onSelect: (tab: Filter) => void;

@@ -1,6 +1,14 @@
-import { Layout } from "antd";
-import { Outlet } from "react-router-dom";
-import Navigation from "../components/Navigation/Navigation";
+import { Layout, Spin } from "antd";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import SiderMenu from "../components/Menu/Menu";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions, profileActions } from "../store/AuthSlice";
+import { AppDispatch, RootState } from "../store";
+import { tokenUtil } from "../components/TokenUtil/tokenUtil";
+import axios from "axios";
+import { LoadingOutlined } from "@ant-design/icons";
+import { getProfile, refreshToken, removeTokens } from "../store/authAction";
 
 const { Sider, Content } = Layout;
 
@@ -31,17 +39,77 @@ const layoutStyle = {
 };
 
 const RootLayout: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const isAuth = useSelector((state: RootState) => state.auth.isAuth);
+  const isInitAuthEnded = useSelector(
+    (state: RootState) => state.auth.isInitAuthEnded
+  );
+
+  useEffect(() => {
+    const initAuth = async () => {
+      if (!localStorage.getItem("refreshToken")) {
+        dispatch(authActions.logout());
+        removeTokens();
+        navigate("/auth/login");
+        return;
+      }
+
+      if (!tokenUtil.AccessToken) {
+        try {
+          await dispatch(refreshToken());
+          if (!tokenUtil.AccessToken)
+            throw new Error("Ошибка обновления токена");
+        } catch (error: unknown) {
+          dispatch(authActions.logout());
+          removeTokens();
+          navigate("/auth/login");
+          return;
+        }
+      }
+
+      try {
+        const profileData = await dispatch(getProfile()).unwrap();
+        dispatch(profileActions.setProfileData(profileData));
+        dispatch(authActions.login());
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          dispatch(authActions.logout());
+          dispatch(profileActions.clearProfileData());
+          removeTokens();
+          navigate("/auth/login");
+        }
+      } finally {
+        dispatch(authActions.setInitAuthEnded());
+      }
+    };
+
+    initAuth();
+  }, [dispatch, navigate]);
+  if (!isInitAuthEnded) {
+    return (
+      <Spin
+        fullscreen
+        indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />}
+      />
+    );
+  }
+  if (!isAuth) {
+    return <Navigate to="/auth/login" />;
+  }
   return (
-    <Layout style={layoutStyle}>
-      <Sider width="25%" style={siderStyle}>
-        <Navigation />
-      </Sider>
+    <>
       <Layout style={layoutStyle}>
-        <Content style={contentStyle}>
-          <Outlet />
-        </Content>
+        <Sider width="25%" style={siderStyle}>
+          <SiderMenu />
+        </Sider>
+        <Layout style={layoutStyle}>
+          <Content style={contentStyle}>
+            <Outlet />
+          </Content>
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

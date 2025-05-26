@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { Filter, MetaResponse, Todo, TodoInfo } from "../../api/interface.ts";
-import { fetchTasks } from "../../api/api.ts";
+import { Filter, MetaResponse, Todo, TodoInfo } from "../../types/todoTypes.ts";
+import { fetchTasks } from "../../api/todoApi.ts";
 import "./TodoListPage.css";
 import Tabs from "../../components/Tabs/Tabs.tsx";
 import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";
@@ -16,9 +16,19 @@ const TodoListPage: React.FC = () => {
   const [tasks, setTasks] = useState<Todo[]>([]);
 
   const fetchData = useCallback(async () => {
-    const resData: MetaResponse<Todo, TodoInfo> = await fetchTasks(tab);
-    setTasks(resData.data);
-    setQuantityTasks(resData.info!);
+    const resData: MetaResponse<Todo, TodoInfo> | unknown = await fetchTasks(
+      tab
+    );
+    if (
+      resData &&
+      typeof resData === "object" &&
+      "data" in resData &&
+      "info" in resData
+    ) {
+      const typedResData = resData as MetaResponse<Todo, TodoInfo>;
+      setTasks(typedResData.data);
+      setQuantityTasks(typedResData.info!);
+    }
   }, [tab]);
 
   useEffect(() => {

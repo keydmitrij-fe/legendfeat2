@@ -1,5 +1,13 @@
-import { List, Checkbox, Typography, Button, Form, Input } from "antd";
-import type { FormProps } from "antd";
+import {
+  List,
+  Checkbox,
+  Typography,
+  Button,
+  Form,
+  Input,
+  notification,
+} from "antd";
+import type { FormProps, NotificationArgsProps } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { EditFilled, DeleteFilled } from "@ant-design/icons";
 import { useState } from "react";
@@ -7,10 +15,15 @@ import {
   fetchEditTasksToDone,
   deleteTask,
   fetchEditTasksName,
-} from "../../api/api.ts";
+} from "../../api/todoApi.ts";
 import "./TodoItem.css";
-import { TodoRequest, FieldTaskName } from "../../api/interface.ts";
+import { TodoRequest, FieldTaskName } from "../../types/todoTypes.ts";
 import { useForm } from "antd/es/form/Form";
+import {
+  MAXIMAL_TASK_LENGTH,
+  MINIMAL_TASK_LENGTH,
+} from "../../constants/constants.ts";
+type NotificationPlacement = NotificationArgsProps["placement"];
 
 const { Text } = Typography;
 
@@ -25,11 +38,24 @@ const TodoItem: React.FC<{
   const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
     props.taskIsDone
   );
+  const [api, contextHolder] = notification.useNotification();
+
+  const openNotification = (
+    placement: NotificationPlacement,
+    message: string
+  ) => {
+    api.error({
+      type: "error",
+      message: message,
+      duration: 6,
+      placement,
+    });
+  };
 
   async function handleEditClickToDone() {
     setUpdateTaskStatus(!props.taskIsDone);
     const request: TodoRequest = { isDone: !updateTaskStatus };
-    await fetchEditTasksToDone(props.taskId, request.isDone!);
+    await fetchEditTasksToDone(props.taskId, request);
     props.onUpdate();
   }
 
@@ -53,7 +79,7 @@ const TodoItem: React.FC<{
     const request: TodoRequest = {
       title: value.taskName,
     };
-    await fetchEditTasksName(props.taskId, request.title!);
+    await fetchEditTasksName(props.taskId, request);
     setIsEdit(false);
     props.onUpdate();
     form.resetFields();
@@ -62,68 +88,71 @@ const TodoItem: React.FC<{
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
     errorInfo
   ) => {
-    console.log("Failed:", errorInfo);
+    openNotification("top", `Failed: ${errorInfo}`);
   };
 
   return (
-    <List.Item className="task-container">
-      <Checkbox
-        checked={updateTaskStatus}
-        onClick={handleEditClickToDone}
-      ></Checkbox>
-      {!isEdit && (
-        <>
-          <div className="label-container">
-            {!updateTaskStatus && <Text>{props.taskTitle}</Text>}
-            {updateTaskStatus && <Text delete>{props.taskTitle}</Text>}
-          </div>
-          <Button type="primary" onClick={handleEditClick}>
-            <EditFilled />
-          </Button>
-        </>
-      )}
-      {isEdit && (
-        <Form
-          name="update"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          style={{ maxWidth: 600 }}
-          initialValues={{ remember: true }}
-          onFinish={handleSubmit}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-          form={form}
-        >
-          <Form.Item<FieldTaskName>
-            name="taskName"
-            rules={[
-              {
-                min: 2,
-                max: 64,
-                message: "Название задачи должно быть от 2 до 64 символов!",
-              },
-              {
-                required: true,
-                message: "Введите название задачи",
-              },
-            ]}
+    <>
+      {contextHolder}
+      <List.Item className="task-container">
+        <Checkbox
+          checked={updateTaskStatus}
+          onClick={handleEditClickToDone}
+        ></Checkbox>
+        {!isEdit && (
+          <>
+            <div className="label-container">
+              {!updateTaskStatus && <Text>{props.taskTitle}</Text>}
+              {updateTaskStatus && <Text delete>{props.taskTitle}</Text>}
+            </div>
+            <Button type="primary" onClick={handleEditClick}>
+              <EditFilled />
+            </Button>
+          </>
+        )}
+        {isEdit && (
+          <Form
+            name="update"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
+            style={{ maxWidth: 600 }}
+            initialValues={{ remember: true }}
+            onFinish={handleSubmit}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            form={form}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item label={null}>
-            <Button type="primary" htmlType="submit">
-              <CheckOutlined />
-            </Button>
-            <Button type="primary" onClick={handleCancelClick}>
-              <CloseOutlined />
-            </Button>
-          </Form.Item>
-        </Form>
-      )}
-      <Button color="danger" variant="solid" onClick={handleDelete}>
-        <DeleteFilled />
-      </Button>
-    </List.Item>
+            <Form.Item<FieldTaskName>
+              name="taskName"
+              rules={[
+                {
+                  min: MINIMAL_TASK_LENGTH,
+                  max: MAXIMAL_TASK_LENGTH,
+                  message: `Название задачи должно быть от ${MINIMAL_TASK_LENGTH} до ${MAXIMAL_TASK_LENGTH} символов!`,
+                },
+                {
+                  required: true,
+                  message: "Введите название задачи",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item label={null}>
+              <Button type="primary" htmlType="submit">
+                <CheckOutlined />
+              </Button>
+              <Button type="primary" onClick={handleCancelClick}>
+                <CloseOutlined />
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
+        <Button color="danger" variant="solid" onClick={handleDelete}>
+          <DeleteFilled />
+        </Button>
+      </List.Item>
+    </>
   );
 };
 
