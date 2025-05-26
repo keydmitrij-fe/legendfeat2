@@ -69,7 +69,7 @@ const Registration: React.FC = () => {
 
   const handleOk = () => {
     setIsSuccessModalOpen(false);
-    navigate("/auth");
+    navigate("/auth/login");
   };
 
   const handleCancel = () => {
