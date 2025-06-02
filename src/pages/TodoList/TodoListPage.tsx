@@ -5,6 +5,17 @@ import "./TodoListPage.css";
 import Tabs from "../../components/Tabs/Tabs.tsx";
 import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";
 import Tasks from "../../components/Tasks/Tasks.tsx";
+import { Layout } from "antd";
+
+const layoutStyle: React.CSSProperties = {
+  justifyContent: "center",
+  borderRadius: 8,
+  maxWidth: "30%",
+  marginLeft: "30rem",
+  overflow: "hidden",
+  width: "auto",
+  background: "#fff",
+};
 
 const TodoListPage: React.FC = () => {
   const [tab, setTab] = useState<Filter>("all");
@@ -45,7 +56,7 @@ const TodoListPage: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <Layout style={layoutStyle}>
       <TaskAdding onUpdate={fetchData} />
       <div className="tabs-container">
         <Tabs quantityTasks={quantityTasks} onSelect={handleClick} />
@@ -53,7 +64,7 @@ const TodoListPage: React.FC = () => {
       <div>
         <Tasks tasks={tasks} onUpdate={fetchData} />
       </div>
-    </div>
+    </Layout>
   );
 };
 

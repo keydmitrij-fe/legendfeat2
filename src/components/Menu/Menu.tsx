@@ -16,6 +16,10 @@ const SiderMenu: React.FC = () => {
       label: <NavLink to="/profile">Личный кабинет</NavLink>,
       key: "/profile",
     },
+    {
+      label: <NavLink to="/users">Пользователи</NavLink>,
+      key: "/users",
+    },
   ];
 
   return (

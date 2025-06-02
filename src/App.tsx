@@ -6,6 +6,8 @@ import RootLayout from "./layouts/RootLayout.tsx";
 import Authorization from "./pages/Authorization/Authorization.tsx";
 import Registration from "./pages/Registration/Registration.tsx";
 import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
+import UserProfilePage from "./pages/UserProfilePage/UserProfilePage.tsx";
+import UsersPage from "./pages/Users/UsersPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +17,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <TodoListPage /> },
       { path: "profile", element: <ProfilePage /> },
+      { path: "users", element: <UsersPage /> },
+      { path: "user", element: <UserProfilePage /> },
     ],
   },
   {

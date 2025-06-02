@@ -1,4 +1,10 @@
-import { Button, notification, NotificationArgsProps, Typography } from "antd";
+import {
+  Button,
+  Layout,
+  notification,
+  NotificationArgsProps,
+  Typography,
+} from "antd";
 import { logoutUser } from "../../api/authApi";
 import { Profile } from "../../types/authTypes";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +15,16 @@ import axios from "axios";
 import { removeTokens } from "../../store/authAction";
 type NotificationPlacement = NotificationArgsProps["placement"];
 const { Title, Paragraph } = Typography;
+
+const contentStyle: React.CSSProperties = {
+  marginTop: "6rem",
+  minHeight: 120,
+  lineHeight: "120px",
+  width: "30%",
+  marginLeft: "30rem",
+  color: "#fff",
+  background: "#fff",
+};
 
 const ProfilePage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,7 +61,7 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <>
+    <Layout style={contentStyle}>
       {contextHolder}
       <Title>Привет</Title>
       <Paragraph>Имя пользователя: {userData.username}</Paragraph>
@@ -55,7 +71,7 @@ const ProfilePage: React.FC = () => {
         <Paragraph>Номер телефона: {userData.phoneNumber}</Paragraph>
       )}
       <Button onClick={handleLogout}>Выход из аккаунта</Button>
-    </>
+    </Layout>
   );
 };
 
