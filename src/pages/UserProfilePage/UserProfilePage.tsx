@@ -43,11 +43,16 @@ const UserProfilePage: React.FC = () => {
     setIsEdit(false);
   };
   const handleSubmit: FormProps<UserRequest>["onFinish"] = async (value) => {
-    const request: UserRequest = {
-      username: value.username,
-      email: value.email,
-      phoneNumber: value.phoneNumber,
-    };
+    const request: UserRequest = {};
+    if (value.username !== userData.username) {
+      request.username = value.username;
+    }
+    if (value.email !== userData.email) {
+      request.email = value.email;
+    }
+    if (value.phoneNumber !== userData.phoneNumber) {
+      request.phoneNumber = value.phoneNumber;
+    }
     const newUserData = await dispatch(
       editUserData({ id: userData.id, data: request })
     ).unwrap();

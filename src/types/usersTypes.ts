@@ -48,3 +48,12 @@ export enum Roles {
     USER = "USER"
 }
 
+export interface UsersModal {
+    modalType: "delete" | "block" | "unblock" | "addRoles" | "deleteRoles" | null,
+    selectedUserId: number,
+}
+
+export interface UserRoles {
+    availableRoles: Roles[] | null,
+    newRoles: Roles[] | null
+}
