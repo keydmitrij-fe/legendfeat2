@@ -6,6 +6,10 @@ import { userActions } from "../../store/adminSlice";
 import { useState } from "react";
 import { UserRequest } from "../../types/usersTypes";
 import { editUserData, getUserData } from "../../store/usersAction";
+import {
+  MAXIMAL_USERNAME_LENGTH,
+  MINIMAL_USERNAME_LENGTH,
+} from "../../constants/constants";
 
 type LayoutType = Parameters<typeof Form>[0]["layout"];
 const { Paragraph } = Typography;
@@ -88,13 +92,55 @@ const UserProfilePage: React.FC = () => {
             onFinish={handleSubmit}
             style={{ maxWidth: formLayout === "inline" ? "none" : 600 }}
           >
-            <Form.Item label="Имя пользователя" name="username">
+            <Form.Item
+              label="Имя пользователя"
+              name="username"
+              rules={[
+                {
+                  required: true,
+                  message: "Пожалуйста, введите имя пользователя",
+                },
+                {
+                  min: MINIMAL_USERNAME_LENGTH,
+                  max: MAXIMAL_USERNAME_LENGTH,
+                  message: `Имя пользователя должно быть от ${MINIMAL_USERNAME_LENGTH} до ${MAXIMAL_USERNAME_LENGTH} символов`,
+                },
+                {
+                  pattern: /[A-Za-zА-Яа-яЁё]/,
+                  message:
+                    "Допустимы только символы русского и латинского алфавитов",
+                },
+              ]}
+            >
               <Input value={userData.username} />
             </Form.Item>
-            <Form.Item label="Email" name="email">
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  type: "email",
+                  message: "Введите подходящий E-mail",
+                },
+                {
+                  required: true,
+                  message: "Пожалуйста, введите E-mail",
+                },
+              ]}
+            >
               <Input value={userData.email} />
             </Form.Item>
-            <Form.Item label="Номер телефона" name="phoneNumber">
+            <Form.Item
+              label="Номер телефона"
+              name="phoneNumber"
+              rules={[
+                {
+                  pattern: /^(\+7|8)\d{10}$/,
+                  message:
+                    "Пожалуйста, введите подходящий номер телефона в формате '+7XXXXXXXXXX' или '8XXXXXXXXXX'",
+                },
+              ]}
+            >
               <Input value={userData.phoneNumber} />
             </Form.Item>
             <Form.Item>
