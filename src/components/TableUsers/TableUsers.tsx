@@ -78,7 +78,7 @@ const TableUsers: React.FC = () => {
       dispatch(
         userFiltersActions.setFilterOffset(tableParams.pagination.current - 1)
       );
-      navigate("/user");
+      navigate(`/users/${id}`);
     },
     [tableParams.pagination, navigate, dispatch]
   );

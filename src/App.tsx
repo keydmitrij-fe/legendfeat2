@@ -18,7 +18,7 @@ const router = createBrowserRouter([
       { index: true, element: <TodoListPage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "users", element: <UsersPage /> },
-      { path: "user", element: <UserProfilePage /> },
+      { path: "users/:userId", element: <UserProfilePage /> },
     ],
   },
   {

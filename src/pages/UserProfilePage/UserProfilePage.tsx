@@ -1,9 +1,9 @@
 import { Button, Form, FormProps, Input, Layout, Typography } from "antd";
 import { AppDispatch, RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { userActions } from "../../store/adminSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UserRequest } from "../../types/usersTypes";
 import { editUserData, getUserData } from "../../store/usersAction";
 import {
@@ -31,6 +31,7 @@ const UserProfilePage: React.FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [formLayout, setFormLayout] = useState<LayoutType>("horizontal");
+  const { userId } = useParams();
 
   const onFormLayoutChange = ({ layout }: { layout: LayoutType }) => {
     setFormLayout(layout);
@@ -65,6 +66,15 @@ const UserProfilePage: React.FC = () => {
     dispatch(getUserData(userData.id));
     form.resetFields();
   };
+
+  useEffect(() => {
+    const initUser = async () => {
+      const id = Number(userId);
+      const userData = await dispatch(getUserData(id)).unwrap();
+      dispatch(userActions.setUserProfileData(userData));
+    };
+    initUser();
+  }, [dispatch, userId]);
 
   return (
     <>
