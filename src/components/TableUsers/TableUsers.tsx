@@ -1,4 +1,11 @@
-import { Button, Table, TableProps, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Table,
+  TablePaginationConfig,
+  TableProps,
+  Tooltip,
+  Typography,
+} from "antd";
 import { Roles, User } from "../../types/usersTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
@@ -19,6 +26,7 @@ import {
   PlusCircleFilled,
   UnlockFilled,
 } from "@ant-design/icons";
+import { FilterValue, SorterResult } from "antd/es/table/interface";
 
 const { Text } = Typography;
 
@@ -49,14 +57,21 @@ const TableUsers: React.FC = () => {
     [dispatch]
   );
 
-  const handleTableChange = async (pagination: any, _: any, sorter: any) => {
-    setTableParams((prev) => ({
-      ...prev,
-      pagination: { ...prev.pagination, current: pagination.current },
-    }));
-    dispatch(userFiltersActions.setFilterOffset(pagination.current - 1));
+  const handleTableChange = async (
+    pagination: TablePaginationConfig,
+    _: Record<string, FilterValue | null>,
+    sorter: SorterResult<User> | SorterResult<User>[]
+  ) => {
+    const current = pagination.current;
+    if (typeof current === "number") {
+      setTableParams((prev) => ({
+        ...prev,
+        pagination: { ...prev.pagination, current },
+      }));
+      dispatch(userFiltersActions.setFilterOffset(current - 1));
+    }
 
-    if (sorter.order) {
+    if (!Array.isArray(sorter) && typeof sorter.field === "string") {
       let order: "asc" | "desc" | undefined;
       if (sorter.order === "ascend") {
         order = "asc";

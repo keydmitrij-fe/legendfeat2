@@ -12,7 +12,7 @@ import {
   usersActions,
   usersModalActions,
 } from "../../store/usersSlice";
-import { UserRolesRequest } from "../../types/usersTypes";
+import { Roles, UserRolesRequest } from "../../types/usersTypes";
 import {
   blockUserProfile,
   deleteUserProfile,
@@ -44,6 +44,12 @@ const UsersModal: React.FC = () => {
     [api]
   );
 
+  const getUsers = async () => {
+    const users = await dispatch(getUsersData(filters)).unwrap();
+    dispatch(usersActions.setUsersData(users));
+    dispatch(usersModalActions.resetModal());
+  };
+
   const handleOk = async () => {
     switch (usersModal.modalType) {
       case "delete":
@@ -60,24 +66,30 @@ const UsersModal: React.FC = () => {
   };
 
   const handleDeleteOk = async () => {
-    await dispatch(deleteUserProfile(usersModal.selectedUserId));
-    const users = await dispatch(getUsersData(filters)).unwrap();
-    dispatch(usersActions.setUsersData(users));
-    dispatch(usersModalActions.resetModal());
+    try {
+      await dispatch(deleteUserProfile(usersModal.selectedUserId));
+      await getUsers();
+    } catch (error: unknown) {
+      openNotification("top", "Ошибка удаления пользователя");
+    }
   };
 
   const handleBlockOk = async () => {
-    await dispatch(blockUserProfile(usersModal.selectedUserId));
-    const users = await dispatch(getUsersData(filters)).unwrap();
-    dispatch(usersActions.setUsersData(users));
-    dispatch(usersModalActions.resetModal());
+    try {
+      await dispatch(blockUserProfile(usersModal.selectedUserId));
+      await getUsers();
+    } catch (error: unknown) {
+      openNotification("top", "Ошибка блокировки пользователя");
+    }
   };
 
   const handleUnblockOk = async () => {
-    await dispatch(unblockUserProfile(usersModal.selectedUserId));
-    const users = await dispatch(getUsersData(filters)).unwrap();
-    dispatch(usersActions.setUsersData(users));
-    dispatch(usersModalActions.resetModal());
+    try {
+      await dispatch(unblockUserProfile(usersModal.selectedUserId));
+      await getUsers();
+    } catch (error: unknown) {
+      openNotification("top", "Ошибка разблокировки пользователя");
+    }
   };
 
   const handleEditRole = async () => {
@@ -91,19 +103,30 @@ const UsersModal: React.FC = () => {
     const request: UserRolesRequest = {
       roles: [...roles.newRoles],
     };
-    await dispatch(
-      editUserRoles({ id: usersModal.selectedUserId, roles: request })
-    );
-    const users = await dispatch(getUsersData(filters)).unwrap();
-    dispatch(usersActions.setUsersData(users));
-    dispatch(usersModalActions.resetModal());
-
+    try {
+      await dispatch(
+        editUserRoles({ id: usersModal.selectedUserId, roles: request })
+      );
+      await getUsers();
+    } catch (error: unknown) {
+      openNotification("top", "Ошибка изменения ролей пользователя");
+    }
     dispatch(userRolesActions.setNewUserRoles(null));
     dispatch(userRolesActions.setAvailableUserRoles(null));
   };
 
   const handleCancel = () => {
     dispatch(usersModalActions.resetModal());
+  };
+
+  const handleSetRoleToAdd = (role: Roles) => {
+    dispatch(
+      userRolesActions.setNewUserRoles([...(roles.newRoles || []), role])
+    );
+  };
+  const handleSetRoleToDelete = (role: Roles) => {
+    const newRoles = (roles.newRoles || []).filter((r) => r !== role);
+    dispatch(userRolesActions.setNewUserRoles(newRoles));
   };
 
   return (
@@ -118,7 +141,11 @@ const UsersModal: React.FC = () => {
         onCancel={handleCancel}
       >
         {usersModal.modalType === "delete" &&
+          roles !== null &&
           "Вы действительно хотите удалить данного пользователя?"}
+        {usersModal.modalType === "delete" &&
+          roles === null &&
+          "У пользователя нет ролей для удаления"}
         {usersModal.modalType === "block" &&
           "Вы действительно хотите заблокировать данного пользователя?"}
         {usersModal.modalType === "unblock" &&
@@ -131,14 +158,7 @@ const UsersModal: React.FC = () => {
                 roles.availableRoles.map((role) => (
                   <Button
                     key={role}
-                    onClick={() =>
-                      dispatch(
-                        userRolesActions.setNewUserRoles([
-                          ...(roles.newRoles || []),
-                          role,
-                        ])
-                      )
-                    }
+                    onClick={() => handleSetRoleToAdd(role)}
                     disabled={roles.newRoles?.includes(role)}
                   >
                     {role}
@@ -163,12 +183,7 @@ const UsersModal: React.FC = () => {
               {roles.availableRoles.map((role) => (
                 <Button
                   key={role}
-                  onClick={() => {
-                    const newRoles = (roles.newRoles || []).filter(
-                      (r) => r !== role
-                    );
-                    dispatch(userRolesActions.setNewUserRoles(newRoles));
-                  }}
+                  onClick={() => handleSetRoleToDelete(role)}
                   disabled={!roles.newRoles?.includes(role)}
                 >
                   {role}

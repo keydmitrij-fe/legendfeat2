@@ -1,18 +1,30 @@
-import { Button, Form, FormProps, Input, Layout, Typography } from "antd";
+import {
+  Button,
+  Flex,
+  Form,
+  FormProps,
+  Input,
+  notification,
+  NotificationArgsProps,
+  Typography,
+} from "antd";
 import { AppDispatch, RootState } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { userActions } from "../../store/adminSlice";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { UserRequest } from "../../types/usersTypes";
 import { editUserData, getUserData } from "../../store/usersAction";
 import {
   MAXIMAL_USERNAME_LENGTH,
   MINIMAL_USERNAME_LENGTH,
+  REGULAR_PHONE_NUMBER,
+  REGULAR_USER_NAME,
 } from "../../constants/constants";
 
-type LayoutType = Parameters<typeof Form>[0]["layout"];
 const { Paragraph } = Typography;
+
+type NotificationPlacement = NotificationArgsProps["placement"];
 
 const contentStyle: React.CSSProperties = {
   marginTop: "6rem",
@@ -22,20 +34,30 @@ const contentStyle: React.CSSProperties = {
   marginLeft: "30rem",
   color: "#fff",
   background: "#fff",
+  flexDirection: "column",
 };
 
 const UserProfilePage: React.FC = () => {
   const userData = useSelector((state: RootState) => state.userProfile);
   const navigate = useNavigate();
+  const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch<AppDispatch>();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [form] = Form.useForm();
-  const [formLayout, setFormLayout] = useState<LayoutType>("horizontal");
   const { userId } = useParams();
 
-  const onFormLayoutChange = ({ layout }: { layout: LayoutType }) => {
-    setFormLayout(layout);
-  };
+  const openNotification = useCallback(
+    (placement: NotificationPlacement, message: string) => {
+      api.error({
+        type: "error",
+        message: message,
+        duration: 6,
+        placement,
+      });
+    },
+    [api]
+  );
+
   const handleBack = () => {
     navigate("/users");
     dispatch(userActions.clearUserProfileData());
@@ -49,14 +71,11 @@ const UserProfilePage: React.FC = () => {
   };
   const handleSubmit: FormProps<UserRequest>["onFinish"] = async (value) => {
     const request: UserRequest = {};
-    if (value.username !== userData.username) {
-      request.username = value.username;
-    }
-    if (value.email !== userData.email) {
-      request.email = value.email;
-    }
-    if (value.phoneNumber !== userData.phoneNumber) {
-      request.phoneNumber = value.phoneNumber;
+    for (const key in value) {
+      const typedKey = key as keyof UserRequest;
+      if (value[typedKey] !== userData[typedKey]) {
+        request[typedKey] = value[typedKey];
+      }
     }
     const newUserData = await dispatch(
       editUserData({ id: userData.id, data: request })
@@ -69,17 +88,22 @@ const UserProfilePage: React.FC = () => {
 
   useEffect(() => {
     const initUser = async () => {
-      const id = Number(userId);
-      const userData = await dispatch(getUserData(id)).unwrap();
-      dispatch(userActions.setUserProfileData(userData));
+      try {
+        const id = Number(userId);
+        const userData = await dispatch(getUserData(id)).unwrap();
+        dispatch(userActions.setUserProfileData(userData));
+      } catch (error: unknown) {
+        openNotification("top", "Ошибка загрузки данных пользователя");
+      }
     };
     initUser();
-  }, [dispatch, userId]);
+  }, [dispatch, userId, openNotification]);
 
   return (
     <>
+      {contextHolder}
       {!isEdit && (
-        <Layout style={contentStyle}>
+        <Flex style={contentStyle}>
           <Paragraph>Имя пользователя: {userData.username}</Paragraph>
           <Paragraph>Email: {userData.email}</Paragraph>
           {!userData.phoneNumber && (
@@ -90,81 +114,72 @@ const UserProfilePage: React.FC = () => {
           )}
           <Button onClick={handleEdit}>Редактировать</Button>
           <Button onClick={handleBack}>Вернуться</Button>
-        </Layout>
+        </Flex>
       )}
       {isEdit && (
-        <Layout style={contentStyle}>
-          <Form
-            layout={formLayout}
-            form={form}
-            initialValues={{ layout: formLayout }}
-            onValuesChange={onFormLayoutChange}
-            onFinish={handleSubmit}
-            style={{ maxWidth: formLayout === "inline" ? "none" : 600 }}
+        <Form form={form} onFinish={handleSubmit} style={contentStyle}>
+          <Form.Item
+            label="Имя пользователя"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Пожалуйста, введите имя пользователя",
+              },
+              {
+                min: MINIMAL_USERNAME_LENGTH,
+                max: MAXIMAL_USERNAME_LENGTH,
+                message: `Имя пользователя должно быть от ${MINIMAL_USERNAME_LENGTH} до ${MAXIMAL_USERNAME_LENGTH} символов`,
+              },
+              {
+                pattern: REGULAR_USER_NAME,
+                message:
+                  "Допустимы только символы русского и латинского алфавитов",
+              },
+            ]}
           >
-            <Form.Item
-              label="Имя пользователя"
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: "Пожалуйста, введите имя пользователя",
-                },
-                {
-                  min: MINIMAL_USERNAME_LENGTH,
-                  max: MAXIMAL_USERNAME_LENGTH,
-                  message: `Имя пользователя должно быть от ${MINIMAL_USERNAME_LENGTH} до ${MAXIMAL_USERNAME_LENGTH} символов`,
-                },
-                {
-                  pattern: /[A-Za-zА-Яа-яЁё]/,
-                  message:
-                    "Допустимы только символы русского и латинского алфавитов",
-                },
-              ]}
-            >
-              <Input value={userData.username} />
-            </Form.Item>
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  type: "email",
-                  message: "Введите подходящий E-mail",
-                },
-                {
-                  required: true,
-                  message: "Пожалуйста, введите E-mail",
-                },
-              ]}
-            >
-              <Input value={userData.email} />
-            </Form.Item>
-            <Form.Item
-              label="Номер телефона"
-              name="phoneNumber"
-              rules={[
-                {
-                  pattern: /^(\+7|8)\d{10}$/,
-                  message:
-                    "Пожалуйста, введите подходящий номер телефона в формате '+7XXXXXXXXXX' или '8XXXXXXXXXX'",
-                },
-              ]}
-            >
-              <Input value={userData.phoneNumber} />
-            </Form.Item>
-            <Form.Item>
-              <Button onClick={handleCancelChanges} type="primary">
-                Отменить редактирование
-              </Button>
-            </Form.Item>
-            <Form.Item>
-              <Button htmlType="submit" type="primary">
-                Сохранить
-              </Button>
-            </Form.Item>
-          </Form>
-        </Layout>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                type: "email",
+                message: "Введите подходящий E-mail",
+              },
+              {
+                required: true,
+                message: "Пожалуйста, введите E-mail",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Номер телефона"
+            name="phoneNumber"
+            rules={[
+              {
+                pattern: REGULAR_PHONE_NUMBER,
+                message:
+                  "Пожалуйста, введите подходящий номер телефона в формате '+7XXXXXXXXXX' или '8XXXXXXXXXX'",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button onClick={handleCancelChanges} type="primary">
+              Отменить редактирование
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button htmlType="submit" type="primary">
+              Сохранить
+            </Button>
+          </Form.Item>
+        </Form>
       )}
     </>
   );

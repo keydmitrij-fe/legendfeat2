@@ -1,31 +1,43 @@
-import React, { useCallback, useEffect } from "react";
-import { Button, Flex, Form, FormProps, Input, Select, Tooltip } from "antd";
-import { UserFilters } from "../../types/usersTypes";
+import React, { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { Flex, Input, notification, NotificationArgsProps, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { userFiltersActions, usersActions } from "../../store/usersSlice";
 import { getUsersData } from "../../store/usersAction";
-import { authActions, profileActions } from "../../store/AuthSlice";
-import axios from "axios";
-import { removeTokens } from "../../store/authAction";
 import { useNavigate } from "react-router-dom";
-import { SearchOutlined } from "@ant-design/icons";
 import UsersModal from "../../components/UsersModal/UsersModal";
 import TableUsers from "../../components/TableUsers/TableUsers";
 
+type NotificationPlacement = NotificationArgsProps["placement"];
+
 const UsersPage: React.FC = () => {
+  const [api, contextHolder] = notification.useNotification();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const filters = useSelector((state: RootState) => state.userFilters);
   const profileRoles = useSelector((state: RootState) => state.profile.roles);
-  const [form] = Form.useForm();
-
-  const handleSubmitSearch: FormProps<UserFilters>["onFinish"] = useCallback(
-    async (value: any) => {
-      dispatch(userFiltersActions.setFilterSearchUser(value.search));
-    },
-    [dispatch]
+  const searchText = useSelector(
+    (state: RootState) => state.userFilters.search
   );
+  const [localSearchText, setLocalSearchText] = useState<string>(
+    searchText ?? ""
+  );
+
+  const openNotification = useCallback(
+    (placement: NotificationPlacement, message: string) => {
+      api.error({
+        type: "error",
+        message: message,
+        duration: 6,
+        placement,
+      });
+    },
+    [api]
+  );
+
+  const handleChangeSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    setLocalSearchText(event.target.value);
+  };
 
   const handleChangeSelect = (value: string | undefined) => {
     switch (value) {
@@ -42,46 +54,40 @@ const UsersPage: React.FC = () => {
   };
 
   useEffect(() => {
+    setLocalSearchText(searchText ?? "");
+  }, [searchText]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      dispatch(userFiltersActions.setFilterSearchUser(localSearchText));
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [dispatch, localSearchText]);
+
+  useEffect(() => {
     const initUsers = async () => {
       try {
         const usersData = await dispatch(getUsersData(filters)).unwrap();
         dispatch(usersActions.setUsersData(usersData));
       } catch (error: unknown) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          dispatch(authActions.logout());
-          dispatch(profileActions.clearProfileData());
-          dispatch(usersActions.clearUsersData());
-          dispatch(userFiltersActions.resetFilters());
-          removeTokens();
-          navigate("/auth/login");
-        }
+        openNotification("top", "Ошибка загрузки пользователей");
       }
     };
     initUsers();
-  }, [dispatch, navigate, filters]);
+  }, [dispatch, navigate, filters, openNotification]);
 
   return (
     <>
+      {contextHolder}
       <Flex justify="space-between">
-        <Form
-          form={form}
-          style={{ display: "flex" }}
-          onFinish={handleSubmitSearch}
-        >
-          <Form.Item name="search">
-            <Input
-              style={{ width: "20rem" }}
-              placeholder="Введите имя пользователя или email"
-            />
-          </Form.Item>
-          <Form.Item>
-            <Tooltip title="Поиск пользователей">
-              <Button htmlType="submit">
-                <SearchOutlined />
-              </Button>
-            </Tooltip>
-          </Form.Item>
-        </Form>
+        <Input
+          name="search"
+          value={localSearchText}
+          onChange={handleChangeSearch}
+          style={{ width: "20rem", marginLeft: "40rem", marginBottom: "1rem" }}
+          placeholder="Введите имя пользователя или email"
+        />
         {profileRoles.includes("ADMIN") && (
           <Select
             defaultValue="all"

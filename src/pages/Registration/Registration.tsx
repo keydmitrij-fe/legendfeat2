@@ -18,6 +18,8 @@ import {
   MINIMAL_LOGIN_LENGTH,
   MINIMAL_PASSWORD_LENGTH,
   MINIMAL_USERNAME_LENGTH,
+  REGULAR_PHONE_NUMBER,
+  REGULAR_USER_NAME,
 } from "../../constants/constants";
 import axios from "axios";
 type NotificationPlacement = NotificationArgsProps["placement"];
@@ -118,7 +120,7 @@ const Registration: React.FC = () => {
               message: `Имя пользователя должно быть от ${MINIMAL_USERNAME_LENGTH} до ${MAXIMAL_USERNAME_LENGTH} символов`,
             },
             {
-              pattern: /[A-Za-zА-Яа-яЁё]/,
+              pattern: REGULAR_USER_NAME,
               message:
                 "Допустимы только символы русского и латинского алфавитов",
             },
@@ -202,7 +204,7 @@ const Registration: React.FC = () => {
           label="Номер телефона"
           rules={[
             {
-              pattern: /^(\+7|8)\d{10}$/,
+              pattern: REGULAR_PHONE_NUMBER,
               message:
                 "Пожалуйста, введите подходящий номер телефона в формате '+7XXXXXXXXXX' или '8XXXXXXXXXX'",
             },
