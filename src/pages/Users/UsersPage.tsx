@@ -90,7 +90,11 @@ const UsersPage: React.FC = () => {
         />
         {profileRoles.includes("ADMIN") && (
           <Select
-            defaultValue="all"
+            value={
+              (filters.isBlocked === true && "blocked") ||
+              (filters.isBlocked === false && "active") ||
+              "all"
+            }
             onChange={handleChangeSelect}
             style={{ width: "16rem" }}
             options={[
