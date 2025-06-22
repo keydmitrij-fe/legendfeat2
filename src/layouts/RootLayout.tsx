@@ -14,9 +14,8 @@ const { Sider, Content } = Layout;
 
 const contentStyle: React.CSSProperties = {
   textAlign: "center",
-  marginTop: "12rem",
+  marginTop: "1rem",
   minHeight: 120,
-  marginLeft: "12rem",
   lineHeight: "120px",
   color: "#fff",
   background: "#fff",
@@ -33,8 +32,7 @@ const siderStyle: React.CSSProperties = {
 const layoutStyle = {
   borderRadius: 8,
   overflow: "hidden",
-  width: "calc(70% - 8px)",
-  maxWidth: "calc(70% - 8px)",
+  width: "100%",
   background: "#fff",
 };
 
@@ -98,18 +96,16 @@ const RootLayout: React.FC = () => {
     return <Navigate to="/auth/login" />;
   }
   return (
-    <>
+    <Layout style={layoutStyle}>
+      <Sider width="10%" style={siderStyle}>
+        <SiderMenu />
+      </Sider>
       <Layout style={layoutStyle}>
-        <Sider width="25%" style={siderStyle}>
-          <SiderMenu />
-        </Sider>
-        <Layout style={layoutStyle}>
-          <Content style={contentStyle}>
-            <Outlet />
-          </Content>
-        </Layout>
+        <Content style={contentStyle}>
+          <Outlet />
+        </Content>
       </Layout>
-    </>
+    </Layout>
   );
 };
 

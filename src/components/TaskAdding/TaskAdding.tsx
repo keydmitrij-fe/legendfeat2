@@ -46,9 +46,12 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
       {contextHolder}
       <Form
         name="basic"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        style={{ maxWidth: 600 }}
+        style={{
+          display: "flex",
+          gap: "3rem",
+          justifyContent: "flex-start",
+          width: "100%",
+        }}
         initialValues={{ remember: true }}
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
@@ -57,6 +60,7 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
       >
         <Form.Item<FieldTaskName>
           name="taskName"
+          style={{ width: "100%" }}
           rules={[
             {
               min: MINIMAL_TASK_LENGTH,
