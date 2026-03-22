@@ -28,11 +28,12 @@ export async function fetchTasks(
     });
     return response.data;
   } catch (error: unknown) {
+    showErrorNotification("Ошибка: ", `${error}`);
     throw error as AxiosError;
   }
 }
 
-export async function addTask(inputValue: string): Promise<Todo | unknown> {
+export async function addTask(inputValue: string): Promise<Todo> {
   try {
     const response = await api.post("/todos", {
       title: inputValue,
@@ -41,6 +42,7 @@ export async function addTask(inputValue: string): Promise<Todo | unknown> {
     return response.data;
   } catch (error: unknown) {
     showErrorNotification("Ошибка: ", `${error}`);
+    throw error as AxiosError;
   }
 }
 
