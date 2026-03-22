@@ -29,7 +29,6 @@ const TaskAdding: React.FC = memo(() => {
   };
 
   const addTaskMutation = useMutation({
-    mutationKey: ["tasks"],
     mutationFn: (data: Required<TodoRequest>["title"]) => {
       return addTask(data);
     },
