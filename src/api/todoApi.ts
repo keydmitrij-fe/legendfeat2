@@ -46,10 +46,35 @@ export async function addTask(inputValue: string): Promise<Todo> {
   }
 }
 
-export async function fetchEditTasksToDone(
+export async function deleteTask(id: number): Promise<Todo> {
+  try {
+    const response = await api.delete(`/todos/${id}`);
+    return response.data;
+  } catch (error: unknown) {
+    showErrorNotification("Ошибка: ", `${error}`);
+    throw error as AxiosError;
+  }
+}
+
+export async function editTaskName(
   id: number,
   task: TodoRequest,
-): Promise<Todo | unknown> {
+): Promise<Todo> {
+  try {
+    const response = await api.put(`/todos/${id}`, {
+      title: task.title,
+    });
+    return response.data;
+  } catch (error: unknown) {
+    showErrorNotification("Ошибка: ", `${error}`);
+    throw error as AxiosError;
+  }
+}
+
+export async function changeTaskStatus(
+  id: number,
+  task: TodoRequest,
+): Promise<Todo> {
   try {
     const response = await api.put(`/todos/${id}`, {
       isDone: task.isDone,
@@ -57,28 +82,6 @@ export async function fetchEditTasksToDone(
     return response.data;
   } catch (error: unknown) {
     showErrorNotification("Ошибка: ", `${error}`);
-  }
-}
-
-export async function deleteTask(id: number): Promise<Todo | unknown> {
-  try {
-    const response = await api.delete(`/todos/${id}`);
-    return response.data;
-  } catch (error: unknown) {
-    showErrorNotification("Ошибка: ", `${error}`);
-  }
-}
-
-export async function fetchEditTasksName(
-  id: number,
-  task: TodoRequest,
-): Promise<Todo | unknown> {
-  try {
-    const response = await api.put(`/todos/${id}`, {
-      title: task.title,
-    });
-    return response;
-  } catch (error: unknown) {
-    showErrorNotification("Ошибка: ", `${error}`);
+    throw error as AxiosError;
   }
 }
