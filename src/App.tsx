@@ -8,6 +8,9 @@ import Registration from "./pages/Registration/Registration.tsx";
 import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage.tsx";
 import UsersPage from "./pages/Users/UsersPage.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -33,9 +36,11 @@ const router = createBrowserRouter([
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <RouterProvider router={router} />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="App">
+        <RouterProvider router={router} />
+      </div>
+    </QueryClientProvider>
   );
 };
 
