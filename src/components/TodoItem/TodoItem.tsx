@@ -12,9 +12,9 @@ import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { EditFilled, DeleteFilled } from "@ant-design/icons";
 import { useState } from "react";
 import {
-  fetchEditTasksToDone,
+  changeTaskStatus,
   deleteTask,
-  fetchEditTasksName,
+  editTaskName,
 } from "../../api/todoApi.ts";
 import "./TodoItem.css";
 import { TodoRequest, FieldTaskName } from "../../types/todoTypes.ts";
@@ -24,6 +24,7 @@ import {
   MINIMAL_TASK_LENGTH,
 } from "../../constants/constants.ts";
 import { useMutation } from "@tanstack/react-query";
+import { queryClient } from "../../App.tsx";
 type NotificationPlacement = NotificationArgsProps["placement"];
 
 const { Text } = Typography;
@@ -52,22 +53,39 @@ const TodoItem: React.FC<{
     });
   };
 
+  const editTaskStatusMutation = useMutation({
+    mutationFn: (newStatus: Required<TodoRequest>["isDone"]) => {
+      return changeTaskStatus(props.taskId, { isDone: newStatus });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const deleteTaskStatusMutation = useMutation({
+    mutationFn: (taskId: number) => {
+      return deleteTask(taskId);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const editTaskTitleMutation = useMutation({
+    mutationFn: (newName: Required<TodoRequest>["title"]) => {
+      return editTaskName(props.taskId, { title: newName });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
   async function handleEditClickToDone() {
-    setUpdateTaskStatus(!props.taskIsDone);
-    const request: TodoRequest = { isDone: !updateTaskStatus };
-    await fetchEditTasksToDone(props.taskId, request);
-    // props.onUpdate();
+    setUpdateTaskStatus((prev) => !prev);
+    editTaskStatusMutation.mutate(props.taskIsDone);
   }
 
   async function handleDelete() {
-    await deleteTask(props.taskId);
-    // props.onUpdate();
+    deleteTaskStatusMutation.mutate(props.taskId);
   }
 
   function handleEditClick() {
     form.setFieldValue("taskName", props.taskTitle);
     setIsEdit(true);
-    // props.onUpdate();
   }
 
   function handleCancelClick() {
@@ -76,12 +94,10 @@ const TodoItem: React.FC<{
   }
 
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
-    const request: TodoRequest = {
-      title: value.taskName,
-    };
-    await fetchEditTasksName(props.taskId, request);
     setIsEdit(false);
-    // props.onUpdate();
+    if (value.taskName) {
+      editTaskTitleMutation.mutate(value.taskName);
+    }
     form.resetFields();
   };
 
