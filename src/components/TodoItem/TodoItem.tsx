@@ -33,12 +33,9 @@ const TodoItem: React.FC<{
   taskId: number;
   taskIsDone: boolean;
   taskTitle: string;
-}> = (props) => {
+}> = ({ taskId, taskIsDone, taskTitle }) => {
   const [form] = useForm();
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
-    props.taskIsDone,
-  );
   const [api, contextHolder] = notification.useNotification();
 
   const openNotification = (
@@ -55,7 +52,7 @@ const TodoItem: React.FC<{
 
   const editTaskStatusMutation = useMutation({
     mutationFn: (newStatus: Required<TodoRequest>["isDone"]) => {
-      return changeTaskStatus(props.taskId, { isDone: newStatus });
+      return changeTaskStatus(taskId, { isDone: newStatus });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
@@ -69,22 +66,21 @@ const TodoItem: React.FC<{
 
   const editTaskTitleMutation = useMutation({
     mutationFn: (newName: Required<TodoRequest>["title"]) => {
-      return editTaskName(props.taskId, { title: newName });
+      return editTaskName(taskId, { title: newName });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
   async function handleEditClickToDone() {
-    setUpdateTaskStatus((prev) => !prev);
-    editTaskStatusMutation.mutate(props.taskIsDone);
+    editTaskStatusMutation.mutate(!taskIsDone);
   }
 
   async function handleDelete() {
-    deleteTaskStatusMutation.mutate(props.taskId);
+    deleteTaskStatusMutation.mutate(taskId);
   }
 
   function handleEditClick() {
-    form.setFieldValue("taskName", props.taskTitle);
+    form.setFieldValue("taskName", taskTitle);
     setIsEdit(true);
   }
 
@@ -112,14 +108,14 @@ const TodoItem: React.FC<{
       {contextHolder}
       <List.Item className="task-container">
         <Checkbox
-          checked={updateTaskStatus}
+          checked={taskIsDone}
           onClick={handleEditClickToDone}
         ></Checkbox>
         {!isEdit && (
           <>
             <div className="label-container">
-              {!updateTaskStatus && <Text>{props.taskTitle}</Text>}
-              {updateTaskStatus && <Text delete>{props.taskTitle}</Text>}
+              {!taskIsDone && <Text>{taskTitle}</Text>}
+              {taskIsDone && <Text delete>{taskTitle}</Text>}
             </div>
             <Button type="primary" onClick={handleEditClick}>
               <EditFilled />
