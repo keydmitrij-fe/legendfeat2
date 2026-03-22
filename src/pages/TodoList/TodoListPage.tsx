@@ -6,6 +6,7 @@ import Tabs from "../../components/Tabs/Tabs.tsx";
 import TaskAdding from "../../components/TaskAdding/TaskAdding.tsx";
 import Tasks from "../../components/Tasks/Tasks.tsx";
 import { Layout } from "antd";
+import { useQuery } from "@tanstack/react-query";
 
 const layoutStyle: React.CSSProperties = {
   justifyContent: "center",
@@ -16,40 +17,21 @@ const layoutStyle: React.CSSProperties = {
   width: "auto",
   background: "#fff",
 };
+const emptyTaskQuantity = {
+  all: 0,
+  completed: 0,
+  inWork: 0,
+};
 
 const TodoListPage: React.FC = () => {
   const [tab, setTab] = useState<Filter>("all");
-  const [quantityTasks, setQuantityTasks] = useState<TodoInfo>({
-    all: 0,
-    completed: 0,
-    inWork: 0,
+
+  const { data: tasks } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: () => fetchTasks(tab),
+    staleTime: 5000,
+    refetchInterval: 5000,
   });
-  const [tasks, setTasks] = useState<Todo[]>([]);
-
-  const fetchData = useCallback(async () => {
-    const resData: MetaResponse<Todo, TodoInfo> | unknown = await fetchTasks(
-      tab
-    );
-    if (
-      resData &&
-      typeof resData === "object" &&
-      "data" in resData &&
-      "info" in resData
-    ) {
-      const typedResData = resData as MetaResponse<Todo, TodoInfo>;
-      setTasks(typedResData.data);
-      setQuantityTasks(typedResData.info!);
-    }
-  }, [tab]);
-
-  useEffect(() => {
-    let intervalId = setInterval(fetchData, 5000);
-    fetchData();
-    return () => {
-      clearInterval(intervalId);
-    };
-    // eslint-disable-next-line
-  }, [tab]);
 
   const handleClick = useCallback((tab: Filter) => {
     setTab(tab);
@@ -57,12 +39,15 @@ const TodoListPage: React.FC = () => {
 
   return (
     <Layout style={layoutStyle}>
-      <TaskAdding onUpdate={fetchData} />
+      <TaskAdding />
       <div className="tabs-container">
-        <Tabs quantityTasks={quantityTasks} onSelect={handleClick} />
+        <Tabs
+          quantityTasks={tasks?.info ?? emptyTaskQuantity}
+          onSelect={handleClick}
+        />
       </div>
       <div>
-        <Tasks tasks={tasks} onUpdate={fetchData} />
+        <Tasks tasks={tasks?.data ?? []} />
       </div>
     </Layout>
   );

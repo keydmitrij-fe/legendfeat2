@@ -31,18 +31,17 @@ const TodoItem: React.FC<{
   taskId: number;
   taskIsDone: boolean;
   taskTitle: string;
-  onUpdate: () => void;
 }> = (props) => {
   const [form] = useForm();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
-    props.taskIsDone
+    props.taskIsDone,
   );
   const [api, contextHolder] = notification.useNotification();
 
   const openNotification = (
     placement: NotificationPlacement,
-    message: string
+    message: string,
   ) => {
     api.error({
       type: "error",
@@ -56,18 +55,18 @@ const TodoItem: React.FC<{
     setUpdateTaskStatus(!props.taskIsDone);
     const request: TodoRequest = { isDone: !updateTaskStatus };
     await fetchEditTasksToDone(props.taskId, request);
-    props.onUpdate();
+    // props.onUpdate();
   }
 
   async function handleDelete() {
     await deleteTask(props.taskId);
-    props.onUpdate();
+    // props.onUpdate();
   }
 
   function handleEditClick() {
     form.setFieldValue("taskName", props.taskTitle);
     setIsEdit(true);
-    props.onUpdate();
+    // props.onUpdate();
   }
 
   function handleCancelClick() {
@@ -81,12 +80,12 @@ const TodoItem: React.FC<{
     };
     await fetchEditTasksName(props.taskId, request);
     setIsEdit(false);
-    props.onUpdate();
+    // props.onUpdate();
     form.resetFields();
   };
 
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
-    errorInfo
+    errorInfo,
   ) => {
     openNotification("top", `Failed: ${errorInfo}`);
   };

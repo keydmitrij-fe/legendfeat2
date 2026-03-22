@@ -16,7 +16,7 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
 
   const openNotification = (
     placement: NotificationPlacement,
-    message: string
+    message: string,
   ) => {
     api.error({
       type: "error",
@@ -36,7 +36,7 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
   };
 
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
-    errorInfo
+    errorInfo,
   ) => {
     openNotification("top", `Failed: ${errorInfo}`);
   };
