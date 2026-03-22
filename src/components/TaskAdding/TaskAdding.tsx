@@ -33,7 +33,7 @@ const TaskAdding: React.FC = memo(() => {
     mutationFn: (data: Required<TodoRequest>["title"]) => {
       return addTask(data);
     },
-    onSuccess: () => queryClient.refetchQueries({ queryKey: ["tasks"] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
