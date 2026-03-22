@@ -27,7 +27,7 @@ const TodoListPage: React.FC = () => {
   const [tab, setTab] = useState<Filter>("all");
 
   const { data: tasks } = useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", tab],
     queryFn: () => fetchTasks(tab),
     refetchInterval: 5000,
   });
