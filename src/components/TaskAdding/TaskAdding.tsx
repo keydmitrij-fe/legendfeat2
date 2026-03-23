@@ -60,7 +60,6 @@ const TaskAdding: React.FC = memo(() => {
           width: "100%",
         }}
         initialValues={{ remember: true }}
-        // onFinish={handleSubmit}
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
