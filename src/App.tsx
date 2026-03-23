@@ -10,7 +10,7 @@ import UserProfilePage from "./pages/UserProfilePage/UserProfilePage.tsx";
 import UsersPage from "./pages/Users/UsersPage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-export const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {

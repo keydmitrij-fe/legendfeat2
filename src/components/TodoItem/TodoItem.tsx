@@ -24,7 +24,7 @@ import {
   MINIMAL_TASK_LENGTH,
 } from "../../constants/constants.ts";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../App.tsx";
+import { useQueryClient } from "@tanstack/react-query";
 type NotificationPlacement = NotificationArgsProps["placement"];
 
 const { Text } = Typography;
@@ -37,6 +37,7 @@ const TodoItem: React.FC<{
   const [form] = useForm();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [api, contextHolder] = notification.useNotification();
+  const queryClient = useQueryClient();
 
   const openNotification = (
     placement: NotificationPlacement,

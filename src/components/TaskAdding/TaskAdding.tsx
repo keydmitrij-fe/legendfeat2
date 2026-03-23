@@ -10,11 +10,12 @@ import {
 } from "../../constants/constants.ts";
 type NotificationPlacement = NotificationArgsProps["placement"];
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../App.tsx";
+import { useQueryClient } from "@tanstack/react-query";
 
 const TaskAdding: React.FC = memo(() => {
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
+  const queryClient = useQueryClient();
 
   const openNotification = (
     placement: NotificationPlacement,
