@@ -18,6 +18,7 @@ const DashboardHeader: React.FC = () => {
     {
       queryKey: ["restaurantList", restaurantSelectValue],
       queryFn: () => fetchRestaurants({ search: restaurantSelectValue }),
+      staleTime: 300000,
     },
   );
 
