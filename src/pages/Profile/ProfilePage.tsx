@@ -34,7 +34,7 @@ const ProfilePage: React.FC = () => {
 
   const openNotification = (
     placement: NotificationPlacement,
-    message: string
+    message: string,
   ) => {
     api.error({
       type: "error",

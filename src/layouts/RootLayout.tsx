@@ -41,7 +41,7 @@ const RootLayout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const isAuth = useSelector((state: RootState) => state.auth.isAuth);
   const isInitAuthEnded = useSelector(
-    (state: RootState) => state.auth.isInitAuthEnded
+    (state: RootState) => state.auth.isInitAuthEnded,
   );
 
   useEffect(() => {

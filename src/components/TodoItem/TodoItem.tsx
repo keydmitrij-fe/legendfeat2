@@ -12,9 +12,9 @@ import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { EditFilled, DeleteFilled } from "@ant-design/icons";
 import { useState } from "react";
 import {
-  fetchEditTasksToDone,
+  changeTaskStatus,
   deleteTask,
-  fetchEditTasksName,
+  editTaskName,
 } from "../../api/todoApi.ts";
 import "./TodoItem.css";
 import { TodoRequest, FieldTaskName } from "../../types/todoTypes.ts";
@@ -23,6 +23,8 @@ import {
   MAXIMAL_TASK_LENGTH,
   MINIMAL_TASK_LENGTH,
 } from "../../constants/constants.ts";
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 type NotificationPlacement = NotificationArgsProps["placement"];
 
 const { Text } = Typography;
@@ -31,18 +33,15 @@ const TodoItem: React.FC<{
   taskId: number;
   taskIsDone: boolean;
   taskTitle: string;
-  onUpdate: () => void;
-}> = (props) => {
+}> = ({ taskId, taskIsDone, taskTitle }) => {
   const [form] = useForm();
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [updateTaskStatus, setUpdateTaskStatus] = useState<boolean>(
-    props.taskIsDone
-  );
   const [api, contextHolder] = notification.useNotification();
+  const queryClient = useQueryClient();
 
   const openNotification = (
     placement: NotificationPlacement,
-    message: string
+    message: string,
   ) => {
     api.error({
       type: "error",
@@ -52,22 +51,38 @@ const TodoItem: React.FC<{
     });
   };
 
+  const editTaskStatusMutation = useMutation({
+    mutationFn: (newStatus: Required<TodoRequest>["isDone"]) => {
+      return changeTaskStatus(taskId, { isDone: newStatus });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const deleteTaskStatusMutation = useMutation({
+    mutationFn: (taskId: number) => {
+      return deleteTask(taskId);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const editTaskTitleMutation = useMutation({
+    mutationFn: (newName: Required<TodoRequest>["title"]) => {
+      return editTaskName(taskId, { title: newName });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
   async function handleEditClickToDone() {
-    setUpdateTaskStatus(!props.taskIsDone);
-    const request: TodoRequest = { isDone: !updateTaskStatus };
-    await fetchEditTasksToDone(props.taskId, request);
-    props.onUpdate();
+    editTaskStatusMutation.mutate(!taskIsDone);
   }
 
   async function handleDelete() {
-    await deleteTask(props.taskId);
-    props.onUpdate();
+    deleteTaskStatusMutation.mutate(taskId);
   }
 
   function handleEditClick() {
-    form.setFieldValue("taskName", props.taskTitle);
+    form.setFieldValue("taskName", taskTitle);
     setIsEdit(true);
-    props.onUpdate();
   }
 
   function handleCancelClick() {
@@ -76,17 +91,15 @@ const TodoItem: React.FC<{
   }
 
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
-    const request: TodoRequest = {
-      title: value.taskName,
-    };
-    await fetchEditTasksName(props.taskId, request);
     setIsEdit(false);
-    props.onUpdate();
+    if (value.taskName) {
+      editTaskTitleMutation.mutate(value.taskName);
+    }
     form.resetFields();
   };
 
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
-    errorInfo
+    errorInfo,
   ) => {
     openNotification("top", `Failed: ${errorInfo}`);
   };
@@ -96,14 +109,14 @@ const TodoItem: React.FC<{
       {contextHolder}
       <List.Item className="task-container">
         <Checkbox
-          checked={updateTaskStatus}
+          checked={taskIsDone}
           onClick={handleEditClickToDone}
         ></Checkbox>
         {!isEdit && (
           <>
             <div className="label-container">
-              {!updateTaskStatus && <Text>{props.taskTitle}</Text>}
-              {updateTaskStatus && <Text delete>{props.taskTitle}</Text>}
+              {!taskIsDone && <Text>{taskTitle}</Text>}
+              {taskIsDone && <Text delete>{taskTitle}</Text>}
             </div>
             <Button type="primary" onClick={handleEditClick}>
               <EditFilled />

@@ -9,14 +9,17 @@ import {
   MINIMAL_TASK_LENGTH,
 } from "../../constants/constants.ts";
 type NotificationPlacement = NotificationArgsProps["placement"];
+import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
+const TaskAdding: React.FC = memo(() => {
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
+  const queryClient = useQueryClient();
 
   const openNotification = (
     placement: NotificationPlacement,
-    message: string
+    message: string,
   ) => {
     api.error({
       type: "error",
@@ -26,17 +29,22 @@ const TaskAdding: React.FC<{ onUpdate: () => void }> = memo(({ onUpdate }) => {
     });
   };
 
+  const addTaskMutation = useMutation({
+    mutationFn: (data: Required<TodoRequest>["title"]) => {
+      return addTask(data);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
   const handleSubmit: FormProps<FieldTaskName>["onFinish"] = async (value) => {
-    const request: TodoRequest = {
-      title: value.taskName,
-    };
-    await addTask(request.title!);
-    onUpdate();
-    form.resetFields();
+    if (value.taskName) {
+      addTaskMutation.mutate(value.taskName);
+      form.resetFields();
+    }
   };
 
   const onFinishFailed: FormProps<FieldTaskName>["onFinishFailed"] = (
-    errorInfo
+    errorInfo,
   ) => {
     openNotification("top", `Failed: ${errorInfo}`);
   };
