@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.layout {
+    display: flex;
+    background-color: white;
+}
+
+.image {
+    max-height: 100vh;
+}
+
+.form {
+    margin-top: 8rem;
+    margin-left: 18rem;
+    text-align: center;
+
+}
+
+.logoContainer {
+    display: flex;
+    margin-bottom: 2rem;
+}
