@@ -1,6 +1,6 @@
 import { DatePicker, DatePickerProps, Select } from "antd";
 import { RangePickerProps } from "antd/es/date-picker";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { fetchRestaurants } from "./mocks";
 import { useQuery } from "@tanstack/react-query";
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
@@ -8,6 +8,11 @@ import { isLabelWithInternallyDisabledControl } from "@testing-library/user-even
 const DashboardHeader: React.FC = () => {
   const [restaurantSelectValue, setRestaurantSelectValue] =
     useState<string>("");
+
+  const [dateRange, setDateRange] = useState<[string, string] | undefined>(
+    undefined,
+  );
+
   const { RangePicker } = DatePicker;
   const [metrics, setMetrics] = useState<string[]>(["Ava Swift"]);
   const [selectedDateRange, setSelectedDateRange] = useState<string[]>([
@@ -32,7 +37,9 @@ const DashboardHeader: React.FC = () => {
     <div>
       <RangePicker
         onChange={(dayjsDate, dateString) => {
-          console.log("Formatted Selected Time: ", dateString);
+          const formattedFromDate = new Date(dateString[0]).toISOString();
+          const formattedToDate = new Date(dateString[1]).toISOString();
+          setDateRange([formattedFromDate, formattedToDate]);
         }}
         onOk={onOk}
       />
