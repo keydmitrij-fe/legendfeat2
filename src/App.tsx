@@ -9,6 +9,7 @@ import AuthLayout from "./layouts/AuthLayout/AuthLayout.tsx";
 import UserProfilePage from "./pages/UserProfilePage/UserProfilePage.tsx";
 import UsersPage from "./pages/Users/UsersPage.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import DashboardPage from "./pages/Dashboard/Dashboard.tsx";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { index: true, element: <TodoListPage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "users", element: <UsersPage /> },
+      { path: "dashboard", element: <DashboardPage /> },
       { path: "users/:userId", element: <UserProfilePage /> },
     ],
   },
