@@ -1,4 +1,9 @@
-import { GetQueryParams, Restaurant } from "../../types/dashboardTypes";
+import {
+  DashboardDataRequest,
+  DashboardDataResponse,
+  GetQueryParams,
+  Restaurant,
+} from "../../types/dashboardTypes";
 
 // 2. Исходные типизированные данные
 const mockRestaurants: Restaurant[] = [
@@ -32,5 +37,76 @@ export const fetchRestaurants = (
 
       resolve(filteredRestaurants);
     }, 800); // имитация задержки сети 800мс
+  });
+};
+
+// 1. Интерфейсы по вашему контракту
+export interface Metric {
+  name: string;
+  id: number;
+}
+
+// 2. Исходные типизированные данные
+const mockMetrics: Metric[] = [
+  { id: 1, name: "Выручка" },
+  { id: 2, name: "Количество заказов" },
+  { id: 3, name: "Средний чек" },
+  { id: 4, name: "Отмененные заказы" },
+  { id: 5, name: "Новые клиенты" },
+];
+
+// 3. Имитация GET /api/metrics с задержкой сети
+export const fetchMetrics = (): Promise<Metric[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockMetrics);
+    }, 600); // имитация задержки сети 600мс
+  });
+};
+
+const METRICS_DICTIONARY: Record<string, string> = {
+  revenue: "Выручка",
+  orders_count: "Количество заказов",
+  average_bill: "Средний чек",
+  canceled_orders: "Отмененные заказы",
+  new_customers: "Новые клиенты",
+};
+
+// Имитация POST /api/dashboardData
+export const fetchDashboardData = (
+  body: DashboardDataRequest,
+): Promise<DashboardDataResponse[]> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Валидация обязательных полей
+      if (!body.restaurantId || !body.dateStart || !body.dateEnd) {
+        reject(
+          new Error(
+            "Missing required parameters: restaurantId, dateStart, or dateEnd",
+          ),
+        );
+        return;
+      }
+
+      if (!body.metricIds || body.metricIds.length === 0) {
+        resolve([]);
+        return;
+      }
+
+      // Генерация псевдослучайных данных на основе переданных metricIds
+      const response: DashboardDataResponse[] = body.metricIds.map((id) => {
+        const metricName = METRICS_DICTIONARY[id] || `Метрика ${id}`;
+
+        // Генерация случайного значения (можно привязать к restaurantId для стабильности)
+        const randomValue = Math.floor(Math.random() * 10000) + 50;
+
+        return {
+          name: metricName,
+          value: randomValue,
+        };
+      });
+
+      resolve(response);
+    }, 1000); // имитация задержки сети 1000мс
   });
 };

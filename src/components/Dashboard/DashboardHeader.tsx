@@ -1,7 +1,7 @@
 import { DatePicker, DatePickerProps, Select } from "antd";
 import { RangePickerProps } from "antd/es/date-picker";
 import { use, useEffect, useState } from "react";
-import { fetchRestaurants } from "./mocks";
+import { fetchMetrics, fetchRestaurants } from "./mocks";
 import { useQuery } from "@tanstack/react-query";
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 
@@ -14,7 +14,8 @@ const DashboardHeader: React.FC = () => {
   );
 
   const { RangePicker } = DatePicker;
-  const [metrics, setMetrics] = useState<string[]>(["Ava Swift"]);
+
+  const [selectedMetricsIds, setSelectedMetricsIds] = useState<number[]>([]);
 
   const { data: restaurantList, isLoading: restaurantListIsLoading } = useQuery(
     {
@@ -23,6 +24,12 @@ const DashboardHeader: React.FC = () => {
       staleTime: 300000,
     },
   );
+
+  const { data: metricsList, isLoading: metricsListIsLoading } = useQuery({
+    queryKey: ["metricsList"],
+    queryFn: fetchMetrics,
+    staleTime: 300000,
+  });
 
   return (
     <div>
@@ -51,13 +58,16 @@ const DashboardHeader: React.FC = () => {
       />
       <Select
         mode="multiple"
+        loading={metricsListIsLoading}
         style={{ width: 120 }}
-        onChange={setMetrics}
+        onChange={setSelectedMetricsIds}
         placeholder="Метрики"
-        options={[
-          { value: "1", label: "Метрика 1" },
-          { value: "2", label: "Метрика 2" },
-        ]}
+        options={metricsList?.map((metric) => {
+          return {
+            value: metric.id,
+            label: metric.name,
+          };
+        })}
       />
     </div>
   );
