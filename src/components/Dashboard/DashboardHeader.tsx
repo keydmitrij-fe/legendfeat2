@@ -15,9 +15,6 @@ const DashboardHeader: React.FC = () => {
 
   const { RangePicker } = DatePicker;
   const [metrics, setMetrics] = useState<string[]>(["Ava Swift"]);
-  const [selectedDateRange, setSelectedDateRange] = useState<string[]>([
-    "Ava Swift",
-  ]);
 
   const { data: restaurantList, isLoading: restaurantListIsLoading } = useQuery(
     {
@@ -27,12 +24,6 @@ const DashboardHeader: React.FC = () => {
     },
   );
 
-  const onOk = (
-    value: DatePickerProps["value"] | RangePickerProps["value"],
-  ) => {
-    console.log("onOk: ", value);
-  };
-
   return (
     <div>
       <RangePicker
@@ -41,7 +32,6 @@ const DashboardHeader: React.FC = () => {
           const formattedToDate = new Date(dateString[1]).toISOString();
           setDateRange([formattedFromDate, formattedToDate]);
         }}
-        onOk={onOk}
       />
       <Select
         filterOption={false}
