@@ -13,6 +13,10 @@ export interface Metric {
   name: string;
 }
 
+export interface DashboardDataResponseItem extends Metric {
+  value: number;
+}
+
 export interface DashboardDataRequest {
   metricIds: Metric["id"][];
   restaurantId: number;
@@ -20,7 +24,7 @@ export interface DashboardDataRequest {
   dateEnd: string; // ISOString
 }
 
-export interface DashboardDataResponse {
-  name: string;
+// Наследует id и name из Metric, добавляет value
+export interface DashboardDataResponse extends Metric {
   value: number;
 }

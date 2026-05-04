@@ -72,41 +72,46 @@ const METRICS_DICTIONARY: Record<string, string> = {
   new_customers: "Новые клиенты",
 };
 
-// Имитация POST /api/dashboardData
-export const fetchDashboardData = (
-  body: DashboardDataRequest,
-): Promise<DashboardDataResponse[]> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Валидация обязательных полей
-      if (!body.restaurantId || !body.dateStart || !body.dateEnd) {
-        reject(
-          new Error(
-            "Missing required parameters: restaurantId, dateStart, or dateEnd",
-          ),
-        );
-        return;
-      }
+// Элемент ответа расширяет Metric, добавляя value
 
-      if (!body.metricIds || body.metricIds.length === 0) {
-        resolve([]);
-        return;
-      }
-
-      // Генерация псевдослучайных данных на основе переданных metricIds
-      const response: DashboardDataResponse[] = body.metricIds.map((id) => {
-        const metricName = METRICS_DICTIONARY[id] || `Метрика ${id}`;
-
-        // Генерация случайного значения (можно привязать к restaurantId для стабильности)
-        const randomValue = Math.floor(Math.random() * 10000) + 50;
-
-        return {
-          name: metricName,
-          value: randomValue,
-        };
-      });
-
-      resolve(response);
-    }, 1000); // имитация задержки сети 1000мс
-  });
+// 2. Словарь доступных метрик (только id и name)
+const AVAILABLE_METRICS: Record<string, string> = {
+  revenue: "Выручка",
+  orders_count: "Количество заказов",
+  average_check: "Средний чек",
+  canceled_orders: "Отмененные заказы",
 };
+
+/**
+ * Генерация ответа по контракту DashboardDataResponse[]
+ */
+export function generateMockDashboardData(
+  request: DashboardDataRequest,
+): DashboardDataResponse[] {
+  return request.metricIds.map((id: string): DashboardDataResponse => {
+    const name = AVAILABLE_METRICS[id] || `Метрика ${id}`;
+
+    // Генерация псевдослучайных данных
+    const baseValue = Math.floor(Math.random() * 500) + 10;
+    const value = id === "revenue" ? baseValue * 20 : baseValue;
+
+    return {
+      id,
+      name,
+      value,
+    };
+  });
+}
+
+/**
+ * Имитация асинхронного сетевого запроса с задержкой
+ */
+export function fetchMockDashboardData(
+  request: DashboardDataRequest,
+): Promise<DashboardDataResponse[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(generateMockDashboardData(request));
+    }, 500);
+  });
+}
