@@ -76,10 +76,11 @@ const METRICS_DICTIONARY: Record<string, string> = {
 
 // 2. Словарь доступных метрик (только id и name)
 const AVAILABLE_METRICS: Record<string, string> = {
-  revenue: "Выручка",
-  orders_count: "Количество заказов",
-  average_check: "Средний чек",
-  canceled_orders: "Отмененные заказы",
+  1: "Выручка",
+  2: "Количество заказов",
+  3: "Средний чек",
+  4: "Отмененные заказы",
+  5: "Касса за день",
 };
 
 /**

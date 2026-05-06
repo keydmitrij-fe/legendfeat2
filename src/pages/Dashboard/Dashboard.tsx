@@ -4,29 +4,54 @@ import DashboardCardBlock from "../../components/Dashboard/DashboardCardBlock";
 import { useQuery } from "@tanstack/react-query";
 import { fetchMockDashboardData } from "../../components/Dashboard/mocks";
 import { DashboardDataRequest } from "../../types/dashboardTypes";
+import { Metric } from "web-vitals";
+
+type DateRange = Pick<DashboardDataRequest, "dateEnd" | "dateStart">;
 
 const DashboardPage: React.FC = () => {
-  // const [metricData, setMetricData] = useState<object>({});
-  const lastMonthFilter: DashboardDataRequest = {
-    metricIds: ["revenue", "average_check"],
-    restaurantId: 205,
-    dateStart: "2026-04-01T00:00:00.000Z",
-    dateEnd: "2026-04-30T23:59:59.999Z",
-  };
+  const [dateRange, setDateRange] = useState<DateRange>();
+  const [selectedRestaurantId, setSelectedRestaurantId] = useState<number>();
+  const [selectedMetricsIds, setSelectedMetricsIds] =
+    useState<Metric["id"][]>();
+  const [isShowData, setIsShowData] = useState<boolean>(false);
+
+  const isAllFiltersEntered =
+    dateRange && selectedMetricsIds && selectedRestaurantId;
 
   const { data: metricData, isLoading } = useQuery({
-    queryKey: ["metricData"],
-    queryFn: () => fetchMockDashboardData(lastMonthFilter),
+    queryKey: [
+      "metricData",
+      dateRange,
+      selectedMetricsIds,
+      selectedRestaurantId,
+    ],
+    enabled: !!isAllFiltersEntered,
+    queryFn: () => {
+      if (isAllFiltersEntered) {
+        return fetchMockDashboardData({
+          dateEnd: dateRange.dateEnd,
+          dateStart: dateRange.dateStart,
+          metricIds: selectedMetricsIds,
+          restaurantId: selectedRestaurantId,
+        });
+      }
+    },
   });
 
   return (
     <div style={{ color: "black" }}>
-      {isLoading && <div>Loading</div>}
-
-      <DashboardHeader></DashboardHeader>
-      {!isLoading && (
-        <DashboardCardBlock metrics={metricData!}></DashboardCardBlock>
-      )}
+      <DashboardHeader
+        selectDate={setDateRange}
+        selectMetrics={setSelectedMetricsIds}
+        selectRestaurant={setSelectedRestaurantId}
+      />
+      <button
+        disabled={!isAllFiltersEntered}
+        onClick={() => setIsShowData(true)}
+      >
+        Отобразить
+      </button>
+      {metricData && isShowData && <DashboardCardBlock metrics={metricData} />}
     </div>
   );
 };
