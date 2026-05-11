@@ -4,18 +4,26 @@ import { use, useEffect, useState } from "react";
 import { fetchMetrics, fetchRestaurants } from "./mocks";
 import { useQuery } from "@tanstack/react-query";
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
+import { DashboardDataRequest } from "../../types/dashboardTypes";
 
-const DashboardHeader: React.FC = () => {
+interface Props {
+  selectRestaurant: React.Dispatch<React.SetStateAction<number | undefined>>;
+  selectMetrics: React.Dispatch<React.SetStateAction<string[] | undefined>>;
+  selectDate: React.Dispatch<
+    React.SetStateAction<
+      Pick<DashboardDataRequest, "dateEnd" | "dateStart"> | undefined
+    >
+  >;
+}
+
+const DashboardHeader: React.FC<Props> = ({
+  selectDate,
+  selectMetrics,
+  selectRestaurant,
+}) => {
   const [restaurantSelectValue, setRestaurantSelectValue] =
     useState<string>("");
-
-  const [dateRange, setDateRange] = useState<[string, string] | undefined>(
-    undefined,
-  );
-
   const { RangePicker } = DatePicker;
-
-  const [selectedMetricsIds, setSelectedMetricsIds] = useState<number[]>([]);
 
   const { data: restaurantList, isLoading: restaurantListIsLoading } = useQuery(
     {
@@ -35,9 +43,12 @@ const DashboardHeader: React.FC = () => {
     <div>
       <RangePicker
         onChange={(dayjsDate, dateString) => {
-          const formattedFromDate = new Date(dateString[0]).toISOString();
-          const formattedToDate = new Date(dateString[1]).toISOString();
-          setDateRange([formattedFromDate, formattedToDate]);
+          const formattedDateStart = new Date(dateString[0]).toISOString();
+          const formattedDateEnd = new Date(dateString[1]).toISOString();
+          selectDate({
+            dateStart: formattedDateStart,
+            dateEnd: formattedDateEnd,
+          });
         }}
       />
       <Select
@@ -45,6 +56,7 @@ const DashboardHeader: React.FC = () => {
         loading={restaurantListIsLoading}
         placeholder="Ресторан"
         showSearch
+        onChange={(id) => selectRestaurant(Number(id))}
         defaultValue={restaurantSelectValue}
         onSearch={(val) => setRestaurantSelectValue(val)}
         style={{ width: 120 }}
@@ -60,7 +72,7 @@ const DashboardHeader: React.FC = () => {
         mode="multiple"
         loading={metricsListIsLoading}
         style={{ width: 120 }}
-        onChange={setSelectedMetricsIds}
+        onChange={selectMetrics}
         placeholder="Метрики"
         options={metricsList?.map((metric) => {
           return {
